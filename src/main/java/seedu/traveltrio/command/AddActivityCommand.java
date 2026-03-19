@@ -11,7 +11,8 @@ public class AddActivityCommand extends ActivityCommand{
     private final String end;
 
 
-    public AddActivityCommand(ActivityList activityList, String name, String location, String date, String start, String end) {
+    public AddActivityCommand(ActivityList activityList, String name,
+                              String location, String date, String start, String end) {
         super(activityList);
         this.name = name;
         this.location = location;

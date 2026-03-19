@@ -1,9 +1,7 @@
 package seedu.traveltrio.command;
 
-import seedu.traveltrio.model.Activity;
 import seedu.traveltrio.model.ActivityList;
 
-import java.util.ArrayList;
 
 public abstract class ActivityCommand {
 

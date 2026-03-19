@@ -3,6 +3,7 @@ package seedu.traveltrio.model;
 import java.util.ArrayList;
 
 public class TripList {
+
     private final ArrayList<Trip> trips;
 
     public TripList() {
@@ -38,5 +39,10 @@ public class TripList {
         }
         return matchingTrips;
     }
+
+    public boolean contains(Trip trip) {
+        return trips.contains(trip);
+    }
+
 }
 

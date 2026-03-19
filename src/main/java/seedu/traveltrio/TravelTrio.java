@@ -18,15 +18,17 @@ import java.util.Scanner;
 public class TravelTrio {
     private final static TripList tripList = new TripList();
     private static Trip openTrip = null;
+    private final static String LOGO =
+            "  _______                   _ _______   _ \n"
+            + " |__   __|                 | |__   __| (_) \n"
+            + "    | |_ __ __ ___   _____ | |  | |_ __ _  ___  \n"
+            + "    | | '__/ _` \\ \\ / / _ \\| |  | | '__| |/ _ \\ \n"
+            + "    | | | | (_| |\\ V /  __/| |  | | |  | | (_) |\n"
+            + "    |_|_|  \\__,_| \\_/ \\___||_|  |_|_|  |_|\\___/ \n";
 
     public static void main(String[] args) {
-        String logo =     "  _______                   _ _______   _ \n"
-                + " |__   __|                 | |__   __| (_) \n"
-                + "    | |_ __ __ ___   _____ | |  | |_ __ _  ___  \n"
-                + "    | | '__/ _` \\ \\ / / _ \\| |  | | '__| |/ _ \\ \n"
-                + "    | | | | (_| |\\ V /  __/| |  | | |  | | (_) |\n"
-                + "    |_|_|  \\__,_| \\_/ \\___||_|  |_|_|  |_|\\___/ \n";
-        System.out.println("Welcome to \n" + logo);
+
+        System.out.println("Welcome to \n" + LOGO);
         System.out.println("How can I help you plan today?");
 
         Scanner in = new Scanner(System.in);
@@ -70,8 +72,9 @@ public class TravelTrio {
                     int tripIdx = Integer.parseInt(details);
                     System.out.println(new DeleteTripCommand(tripList, tripIdx).execute());
                     // If the open trip is the one deleted, reset opentrip
-                    if (openTrip != null && tripList.indexOf(openTrip) == -1) {
+                    if (openTrip != null && !tripList.contains(openTrip)) {
                         openTrip = null;
+                        System.out.println("The active trip was deleted. Use 'opentrip' to open a trip.");
                     }
                     break;
 
@@ -86,13 +89,13 @@ public class TravelTrio {
 
                     System.out.println(new AddActivityCommand(openTrip.getActivities(),
                             title, location, date, startTime, endTime)
-                            .execute(openTrip.getDestination()));
+                            .execute(openTrip.getName()));
                     break;
 
                 case "listactivity":
                     ensureTripOpen();
                     System.out.println(new ListActivityCommand(openTrip.getActivities())
-                            .execute(openTrip.getDestination()));
+                            .execute(openTrip.getName()));
                     break;
 
                 case "editactivity":
@@ -102,13 +105,13 @@ public class TravelTrio {
 
                     System.out.println(new EditActivityCommand(openTrip.getActivities(), activityIdx,
                             editMap.get("t/"), editMap.get("l/"), editMap.get("d/"),
-                            editMap.get("st/"), editMap.get("et/")).execute(openTrip.getDestination()));
+                            editMap.get("st/"), editMap.get("et/")).execute(openTrip.getName()));
                     break;
 
                 case "deleteactivity":
                     ensureTripOpen();
                     int actIdx = Integer.parseInt(details);
-                    System.out.println(new DeleteActivityCommand(openTrip.getActivities(), actIdx).execute(openTrip.getDestination()));
+                    System.out.println(new DeleteActivityCommand(openTrip.getActivities(), actIdx).execute(openTrip.getName()));
                     break;
 
                 default:

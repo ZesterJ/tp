@@ -7,31 +7,31 @@ Welcome to
     |_|_|  \__,_| \_/ \___||_|  |_|_|  |_|\___/ 
 
 How can I help you plan today?
-> 
+>
 New trip added:
 Seoul (2026-12-01 to 2026-12-10)
-> 
+>
 Trips:
 1. Seoul
-   ? Start: 2026-12-01
-   ? End:   2026-12-10
-> 
+   📅 Start: 2026-12-01
+   📅 End:   2026-12-10
+>
 Opened trip: Seoul (2026-12-01 to 2026-12-10)
-> 
+>
 Activity added to Seoul:
 
 Palace
-? Location: Gyeongbokgung
-? Date: 2026-12-02
-? Time: 1000 to 1200
+📍 Location: Gyeongbokgung
+📆 Date: 2026-12-02
+🕛 Time: 1000 to 1200
 
 > 
 Itinerary for Seoul:
 
 1. Palace
-   ? Location: Gyeongbokgung
-   ? Date: 2026-12-02
-   ? Time: 1000 to 1200
+   📍 Location: Gyeongbokgung
+   📆 Date: 2026-12-02
+   🕛 Time: 1000 to 1200
 
 
-> 
+>

@@ -1,4 +1,4 @@
-package seedu.duke.model;
+package seedu.traveltrio.model;
 
 import java.util.ArrayList;
 
@@ -12,7 +12,7 @@ public class ActivityList {
     public void add(Activity a) {
         activities.add(a);
     }
-    
+
     public Activity remove(int index) { return activities.remove(index); }
 
     public Activity get(int index) {

@@ -27,7 +27,6 @@ public class TravelTrio {
             + "    |_|_|  \\__,_| \\_/ \\___||_|  |_|_|  |_|\\___/ \n";
 
     public static void main(String[] args) {
-
         System.out.println("Welcome to \n" + LOGO);
         System.out.println("How can I help you plan today?");
 

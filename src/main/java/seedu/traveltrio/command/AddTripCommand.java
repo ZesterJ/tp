@@ -28,6 +28,8 @@ public class AddTripCommand extends TripCommand {
             return "❌ Start date must not be later than end date.";
         }
 
+        assert tripList != null : "tripList should be initialized before calling execute()";
+
         Trip trip = new Trip(name, startDate, endDate);
         tripList.add(trip);
         return "New trip added:\n" + trip;

@@ -12,6 +12,7 @@ public class ActivityList {
     }
 
     public void add(Activity a) {
+        assert a != null : "Activity to add should not be null";
         activities.add(a);
     }
 

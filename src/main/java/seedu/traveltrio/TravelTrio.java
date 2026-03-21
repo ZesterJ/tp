@@ -64,6 +64,7 @@ public class TravelTrio {
                 case "opentrip":
                     int idx = Integer.parseInt(details);
                     openTrip = tripList.get(idx - 1);
+                    assert openTrip != null;
                     System.out.println(new OpenTripCommand(tripList, idx).execute());
                     break;
 

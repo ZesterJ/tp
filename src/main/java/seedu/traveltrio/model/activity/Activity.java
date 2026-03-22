@@ -1,5 +1,7 @@
 package seedu.traveltrio.model.activity;
 
+import seedu.traveltrio.TravelTrioException;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -18,7 +20,7 @@ public class Activity {
     private LocalTime end;
 
 
-    public Activity(String name, String location, String date, String start, String end) {
+    public Activity(String name, String location, String date, String start, String end) throws TravelTrioException {
         this.name = name;
         this.location = location;
         this.date = parseDate(date);
@@ -26,30 +28,30 @@ public class Activity {
         this.end = parseTime(end, "End time");
 
         if (this.start != null && this.end != null && !this.end.isAfter(this.start)) {
-            throw new IllegalArgumentException("End time must be after start time.");
+            throw new TravelTrioException("End time must be after start time.");
         }
     }
 
-    private LocalDate parseDate(String date) {
+    private LocalDate parseDate(String date) throws TravelTrioException {
         if (date == null || date.isBlank()) {
             return null;
         }
         try {
             return LocalDate.parse(date, DATE_FORMATTER);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Invalid date format: '" + date
+            throw new TravelTrioException("Invalid date format: '" + date
                     + "'. Please use YYYY-MM-DD.");
         }
     }
 
-    private LocalTime parseTime(String time, String fieldName) {
+    private LocalTime parseTime(String time, String fieldName) throws TravelTrioException {
         if (time == null || time.isBlank()) {
             return null;
         }
         try {
             return LocalTime.parse(time, TIME_FORMATTER);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Invalid " + fieldName + " format: '" + time
+            throw new TravelTrioException("Invalid " + fieldName + " format: '" + time
                     + "'. Please use HH:mm.");
         }
     }
@@ -74,7 +76,7 @@ public class Activity {
         return date != null ? date.format(DATE_FORMATTER) : null;
     }
 
-    public void setDate(String date) {
+    public void setDate(String date) throws TravelTrioException {
         this.date = parseDate(date);
     }
 
@@ -82,7 +84,7 @@ public class Activity {
         return start != null ? start.format(TIME_FORMATTER) : null;
     }
 
-    public void setStart(String start) {
+    public void setStart(String start) throws TravelTrioException {
         this.start = parseTime(start, "Start time");
     }
 
@@ -90,7 +92,7 @@ public class Activity {
         return end != null ? end.format(TIME_FORMATTER) : null;
     }
 
-    public void setEnd(String end) {
+    public void setEnd(String end) throws TravelTrioException {
         this.end = parseTime(end, "End time");
     }
 

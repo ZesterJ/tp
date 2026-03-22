@@ -29,47 +29,42 @@ public class CommandProcessor {
             case "addtrip":
                 handleAddTrip();
                 break;
-
             case "listtrip":
                 printTripList();
                 break;
-
             case "opentrip":
                 handleOpenTrip();
                 break;
-
             case "deletetrip":
                 handleDeleteTrip();
                 break;
-
             case "addactivity":
                 handleAddActivity();
                 break;
-
             case "listactivity":
                 handleListActivity();
                 break;
-
             case "editactivity":
                 handleEditActivity();
                 break;
-
             case "deleteactivity":
                 handleDeleteActivity();
                 break;
-
             case "addbudget":
                 handleAddBudget();
                 break;
-
             case "budgetsummary":
                 handleBudgetSummary();
                 break;
             default:
                 handleUnknownCommand();
             }
-        } catch (Exception e){
-            ui.showMessage("Error. " + e.getMessage());
+        } catch (TravelTrioException e){
+            ui.showError(e.getMessage());
+        } catch (IndexOutOfBoundsException e) {
+            ui.showError("That number is not in the list. Please check the list and try again.");
+        } catch (Exception e) {
+            ui.showError("An unexpected error occurred: " + e.getMessage());
         }
     }
 
@@ -79,17 +74,16 @@ public class CommandProcessor {
                 + "editactivity, deleteactivity, addbudget, budgetsummary, exit");
     }
 
-    private void handleBudgetSummary() {
+    private void handleBudgetSummary() throws TravelTrioException {
         ensureTripOpen();
         ui.showMessage(new BudgetSummaryCommand(openTrip.getBudgets(),
                 openTrip.getActivities()).execute());
     }
 
-    private void handleAddBudget() {
+    private void handleAddBudget() throws TravelTrioException {
         ensureTripOpen();
         if (openTrip.getActivities().isEmpty()) {
-            ui.showMessage("No activities found. Please add an activity before setting a budget.");
-            return;
+            throw new TravelTrioException("No activities found. Please add an activity before setting a budget.");
         }
         printActivityList();
         int budgetActivityIdx = ui.promptInt("Enter the number of the activity to add a budget for. ");
@@ -99,7 +93,7 @@ public class CommandProcessor {
                 .execute());
     }
 
-    private void handleDeleteActivity() {
+    private void handleDeleteActivity() throws TravelTrioException {
         ensureTripOpen();
         printActivityList();
         int actIdx = ui.promptInt("Enter the number of the activity to delete");
@@ -107,7 +101,7 @@ public class CommandProcessor {
                 .execute(openTrip.getName()));
     }
 
-    private void handleEditActivity() {
+    private void handleEditActivity() throws TravelTrioException {
         ensureTripOpen();
         printActivityList();
         int activityIdx = ui.promptInt("Enter the number of the activity to edit");
@@ -122,16 +116,16 @@ public class CommandProcessor {
                 .execute(openTrip.getName()));
     }
 
-    private void handleListActivity() {
+    private void handleListActivity() throws TravelTrioException {
         ensureTripOpen();
         printActivityList();
     }
 
-    private void printActivityList() {
+    private void printActivityList() throws TravelTrioException {
         ui.showMessage(new ListActivityCommand(openTrip.getActivities()).execute(openTrip.getName()));
     }
 
-    private void handleAddActivity() {
+    private void handleAddActivity() throws TravelTrioException {
         ensureTripOpen();
 
         String tripStartDate = openTrip.getStartDate();
@@ -142,9 +136,8 @@ public class CommandProcessor {
         String date = ui.promptField("Date (YYYY-MM-DD)");
 
         if (date.compareTo(tripStartDate) < 0 || date.compareTo(tripEndDate) > 0) {
-            ui.showMessage("Error. Activity date (" + date + ") " + "is outside of your trip dates.");
-            ui.showMessage("Your trip is from " + tripStartDate + " to " + tripEndDate + ".");
-            return;
+            throw new TravelTrioException("Activity date (" + date + ") " + "is outside of your trip dates. " +
+                    "Your trip is from " + tripStartDate + " to " + tripEndDate + ".");
         }
 
         String startTime = ui.promptField("Start Time (HH:MM)");
@@ -154,7 +147,7 @@ public class CommandProcessor {
                 .execute(openTrip.getName()));
     }
 
-    private void handleDeleteTrip() {
+    private void handleDeleteTrip() throws TravelTrioException {
         printTripList();
         int tripIdx = ui.promptInt("Enter the number of the trip to delete");
         ui.showMessage(new DeleteTripCommand(tripList, tripIdx).execute());
@@ -165,7 +158,11 @@ public class CommandProcessor {
         }
     }
 
-    private void handleOpenTrip() {
+    private void handleOpenTrip() throws TravelTrioException {
+        if (tripList.isEmpty()) {
+            throw new TravelTrioException("No trips found. Use 'addtrip' to add one!");
+        }
+
         printTripList();
         int idx = ui.promptInt("Enter the number of the trip to open");
         openTrip = tripList.get(idx - 1);
@@ -173,20 +170,20 @@ public class CommandProcessor {
         ui.showMessage(new OpenTripCommand(tripList, idx).execute());
     }
 
-    private void printTripList() {
+    private void printTripList() throws TravelTrioException {
         ui.showMessage(new ListTripCommand(tripList).execute());
     }
 
-    private void handleAddTrip() {
+    private void handleAddTrip() throws TravelTrioException {
         String name = ui.promptField("Trip Name");
         String start = ui.promptField("Start Date (YYYY-MM-DD)");
         String end = ui.promptField("End Date (YYYY-MM-DD)");
-        System.out.println(new AddTripCommand(tripList, name, start, end).execute());
+        ui.showMessage(new AddTripCommand(tripList, name, start, end).execute());
     }
 
-    private void ensureTripOpen() {
+    private void ensureTripOpen() throws TravelTrioException {
         if (this.openTrip == null) {
-            throw new IllegalStateException("You need to open a trip first. (Use 'opentrip')");
+            throw new TravelTrioException("You need to open a trip first. (Use 'opentrip')");
         }
         assert openTrip != null : "openTrip should not be null after check";
     }

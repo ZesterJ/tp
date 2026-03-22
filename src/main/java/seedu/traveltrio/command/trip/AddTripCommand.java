@@ -1,5 +1,6 @@
 package seedu.traveltrio.command.trip;
 
+import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.trip.Trip;
 import seedu.traveltrio.model.trip.TripList;
 
@@ -17,15 +18,15 @@ public class AddTripCommand extends TripCommand {
     }
 
     @Override
-    public String execute() {
+    public String execute() throws TravelTrioException {
         if (name == null || name.isBlank()) {
-            return "[ERROR] Trip name cannot be empty.";
+            throw new TravelTrioException("Trip name cannot be empty.");
         }
         if (startDate == null || endDate == null) {
-            return "[ERROR] Start date and end date must be provided.";
+            throw new TravelTrioException("Start date and end date must be provided.");
         }
         if (startDate.compareTo(endDate) > 0) {
-            return "[ERROR] Start date must not be later than end date.";
+            throw new TravelTrioException("Start date must not be later than end date.");
         }
 
         assert tripList != null : "tripList should be initialized before calling execute()";

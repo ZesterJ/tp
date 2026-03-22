@@ -1,5 +1,6 @@
 package seedu.traveltrio.command.activity;
 
+import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.activity.Activity;
 import seedu.traveltrio.model.activity.ActivityList;
 
@@ -24,11 +25,11 @@ public class EditActivityCommand extends ActivityCommand{
     }
 
 
-    public String execute(String tripName) {
+    public String execute(String tripName) throws TravelTrioException {
         int zeroBasedIndex = index - 1;
 
         if (zeroBasedIndex < 0 || zeroBasedIndex >= activityList.size()) {
-            return "Oops! Invalid activity index provided.";
+            throw new TravelTrioException("Activity number " + index + " does not exist.");
         }
 
         assert activityList != null : "ActivityList must be initialized before editing.";

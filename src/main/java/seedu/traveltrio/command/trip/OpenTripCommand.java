@@ -1,5 +1,6 @@
 package seedu.traveltrio.command.trip;
 
+import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.trip.Trip;
 import seedu.traveltrio.model.trip.TripList;
 
@@ -12,9 +13,9 @@ public class OpenTripCommand extends TripCommand {
     }
 
     @Override
-    public String execute() {
+    public String execute() throws TravelTrioException {
         if (index < 0 || index >= tripList.size()) {
-            return "Invalid trip index.";
+            throw new TravelTrioException("Invalid trip index.");
         }
         Trip tripToOpen = tripList.get(index);
         tripToOpen.setOpen(true);

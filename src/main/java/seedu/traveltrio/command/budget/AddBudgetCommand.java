@@ -1,4 +1,5 @@
 package seedu.traveltrio.command.budget;
+import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.activity.ActivityList;
 import seedu.traveltrio.model.budget.BudgetList;
 import seedu.traveltrio.model.activity.Activity;
@@ -13,9 +14,9 @@ public class AddBudgetCommand extends BudgetCommand {
     }
 
     @Override
-    public String execute() {
+    public String execute() throws TravelTrioException {
         if (activity == null) {
-            return "Please select an activity to add a budget for.";
+            throw new TravelTrioException("Please select an activity to add a budget for.");
         }
         Budget newBudget = new Budget(totalBudget, activity);
         budgetList.addBudget(activity, newBudget);

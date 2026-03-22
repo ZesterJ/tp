@@ -1,5 +1,6 @@
 package seedu.traveltrio.command.activity;
 
+import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.activity.Activity;
 import seedu.traveltrio.model.activity.ActivityList;
 
@@ -22,12 +23,12 @@ public class AddActivityCommand extends ActivityCommand{
     }
 
 
-    public String execute(String tripName) {
+    public String execute(String tripName) throws TravelTrioException {
         Activity a = new Activity(name, location, date, start, end);
 
         String overlapWarning = activityList.add(a);
         if (overlapWarning != null) {
-            return overlapWarning;
+            throw new TravelTrioException(overlapWarning);
         }
 
         return "Activity added to " + tripName + ":\n\n" + a + "\n";

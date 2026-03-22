@@ -1,5 +1,6 @@
 package seedu.traveltrio.command.budget;
 
+import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.activity.ActivityList;
 import seedu.traveltrio.model.budget.BudgetList;
 import seedu.traveltrio.model.activity.Activity;
@@ -15,13 +16,13 @@ public abstract class BudgetCommand {
         this.activity = activity;
     }
 
-    public String run() {
+    public String run() throws TravelTrioException {
         if (!activityList.isTripOpen()) {
-            return "Please open a trip before managing budgets.";
+            throw new TravelTrioException("Please open a trip before managing budgets.");
         } else {
             return execute();
         }
     }
 
-    public abstract String execute();
+    public abstract String execute() throws TravelTrioException;
 }

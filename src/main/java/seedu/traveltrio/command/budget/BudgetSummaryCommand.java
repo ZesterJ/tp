@@ -1,5 +1,6 @@
 package seedu.traveltrio.command.budget;
 
+import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.activity.ActivityList;
 import seedu.traveltrio.model.budget.BudgetList;
 
@@ -10,13 +11,13 @@ public class BudgetSummaryCommand extends BudgetCommand {
     }
 
     @Override
-    public String execute() {
+    public String execute() throws TravelTrioException {
         double totalBudget = budgetList.getTotalTripBudget();
         StringBuilder result = new StringBuilder();
         result.append("Total trip budget: $").append(String.format("%.2f", totalBudget)).append("\n\n");
         
         if (budgetList.getBudgets().isEmpty()) {
-            result.append("No budgets added yet.");
+            throw new TravelTrioException("No budgets added yet.");
         } else {
             result.append("Budget Breakdown:\n");
             var budgets = budgetList.getBudgets();

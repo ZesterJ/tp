@@ -1,5 +1,6 @@
 package seedu.traveltrio.model.budget;
 
+import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.activity.Activity;
 
 public class Budget {
@@ -7,9 +8,9 @@ public class Budget {
     private double amountSpent;
     private final Activity activity;
 
-    public Budget(double totalBudget, Activity activity) {
+    public Budget(double totalBudget, Activity activity) throws TravelTrioException {
         if (totalBudget < 0) {
-            throw new IllegalArgumentException("Total budget cannot be negative.");
+            throw new TravelTrioException("Total budget cannot be negative.");
         }
         this.totalBudget = totalBudget;
         this.amountSpent = 0;
@@ -28,12 +29,12 @@ public class Budget {
         return totalBudget - amountSpent;
     }
 
-    public void addExpense(double amount) {
+    public void addExpense(double amount) throws TravelTrioException {
         if (amount < 0) {
-            throw new IllegalArgumentException("Expense amount cannot be negative.");
+            throw new TravelTrioException("Expense amount cannot be negative.");
         }
         if (amount > getRemainingBudget()) {
-            throw new IllegalArgumentException("Expense exceeds remaining budget.");
+            throw new TravelTrioException("Expense exceeds remaining budget.");
         }
         amountSpent = amount;
     }

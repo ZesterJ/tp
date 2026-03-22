@@ -1,5 +1,6 @@
 package seedu.traveltrio.command.activity;
 
+import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.activity.ActivityList;
 
 public class ListActivityCommand extends ActivityCommand {
@@ -8,9 +9,9 @@ public class ListActivityCommand extends ActivityCommand {
         super(activityList);
     }
 
-    public String execute(String tripName){
+    public String execute(String tripName) throws TravelTrioException {
         if (activityList.isEmpty()){
-            return "The itinerary is Empty.";
+            throw new TravelTrioException("The itinerary is Empty.");
         }
 
         String listToPrint = "Itinerary for " + tripName + ":\n\n";

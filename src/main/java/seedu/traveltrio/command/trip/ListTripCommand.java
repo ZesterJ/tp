@@ -1,5 +1,6 @@
 package seedu.traveltrio.command.trip;
 
+import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.trip.TripList;
 
 public class ListTripCommand extends TripCommand {
@@ -9,9 +10,9 @@ public class ListTripCommand extends TripCommand {
     }
 
     @Override
-    public String execute() {
+    public String execute() throws TravelTrioException {
         if (tripList.isEmpty()) {
-            return "No trips found. Use 'addtrip' to add one!";
+            throw new TravelTrioException("No trips found. Use 'addtrip' to add one!");
         }
 
         StringBuilder sb = new StringBuilder("Trips:\n");

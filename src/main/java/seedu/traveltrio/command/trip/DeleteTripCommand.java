@@ -1,5 +1,6 @@
 package seedu.traveltrio.command.trip;
 
+import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.trip.TripList;
 
 public class DeleteTripCommand extends TripCommand {
@@ -11,17 +12,13 @@ public class DeleteTripCommand extends TripCommand {
     }
 
     @Override
-    public String execute() {
-        try {
-            if (index < 0 || index >= tripList.size()) {
-                return "Invalid trip index.";
-            }
-            String removedTrip = tripList.get(index).toString();
-            tripList.remove(index);
-            return "Deleted trip: " + removedTrip;
-        } catch (NumberFormatException e) {
-            return "Please enter a valid number for the trip index.";
+    public String execute() throws TravelTrioException {
+        if (index < 0 || index >= tripList.size()) {
+            throw new TravelTrioException("Invalid trip index.");
         }
+        String removedTrip = tripList.get(index).toString();
+        tripList.remove(index);
+        return "Deleted trip: " + removedTrip;
     }
     
 }

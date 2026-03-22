@@ -2,6 +2,7 @@ package seedu.traveltrio.model.activity;
 
 import java.util.ArrayList;
 
+import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.trip.Trip;
 
 public class ActivityList {
@@ -13,14 +14,14 @@ public class ActivityList {
         this.trip = trip;
     }
 
-    public String add(Activity a) {
+    public String add(Activity a) throws TravelTrioException {
         assert a != null : "Activity to add should not be null";
 
         for(Activity existing : activities){
             if (a.overlapsWith(existing)) {
-                return "Warning: This activity overlaps with an existing activity:\n\n"
+                throw new TravelTrioException("Warning: This activity overlaps with an existing activity:\n\n"
                         + existing.formatForList() + "\n\n"
-                        + "Please edit the existing activity or choose a different time.";
+                        + "Please edit the existing activity or choose a different time.");
             }
         }
 

@@ -1,5 +1,6 @@
 package seedu.traveltrio.command.trip;
 
+import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.trip.TripList;
 
 public abstract class TripCommand {
@@ -10,7 +11,7 @@ public abstract class TripCommand {
         this.tripList = tripList;
     }
     
-    public abstract String execute();
+    public abstract String execute() throws TravelTrioException;
 
 }
 

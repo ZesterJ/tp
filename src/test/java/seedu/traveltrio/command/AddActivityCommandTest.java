@@ -2,6 +2,7 @@ package seedu.traveltrio.command;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.activity.ActivityList;
 import seedu.traveltrio.model.trip.Trip;
 import seedu.traveltrio.command.activity.AddActivityCommand;
@@ -12,7 +13,7 @@ class AddActivityCommandTest {
 
     //positive
     @Test
-    void execute_activityListAndTripName_successfulMessage() {
+    void execute_activityListAndTripName_successfulMessage() throws TravelTrioException {
         Trip trip = new Trip("Winter trip", "1 Oct", " Dec");
         ActivityList activityList = new ActivityList(trip);
         String tripName = "Japan Trip";
@@ -31,7 +32,7 @@ class AddActivityCommandTest {
     }
 
     @Test
-    void execute_onlyActivityNameAndTripName_successfulMessage() {
+    void execute_onlyActivityNameAndTripName_successfulMessage() throws TravelTrioException {
         Trip trip = new Trip("Winter trip", "1 Oct", " Dec");
         ActivityList activityList = new ActivityList(trip);
         String tripName = "Japan Trip";

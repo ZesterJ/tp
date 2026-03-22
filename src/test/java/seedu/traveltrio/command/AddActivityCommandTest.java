@@ -23,9 +23,9 @@ class AddActivityCommandTest {
                 Activity added to Japan Trip:
                 
                 Hiking at Mount Fuji
-                📍 Location: Mount Fuji
-                📆 Date: 2026-06-28
-                🕛 Time: 08:00 to 14:00
+                 Location: Mount Fuji
+                 Date: 2026-06-28
+                 Time: 08:00 to 14:00
                 """, message);
 
     }
@@ -42,9 +42,9 @@ class AddActivityCommandTest {
                 Activity added to Japan Trip:
                 
                 Hiking at Mount Fuji
-                📍 Location: ---
-                📆 Date: ---
-                🕛 Time: ---
+                 Location: ---
+                 Date: ---
+                 Time: ---
                 """, message);
 
     }

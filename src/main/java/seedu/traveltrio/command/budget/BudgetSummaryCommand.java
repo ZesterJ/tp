@@ -27,7 +27,8 @@ public class BudgetSummaryCommand extends BudgetCommand {
                 result.append(index).append(". ").append(activity.getName()).append("\n");
                 result.append("   Total: $").append(String.format("%.2f", budget.getTotalBudget()));
                 result.append(" | Spent: $").append(String.format("%.2f", budget.getAmountSpent()));
-                result.append(" | Remaining: $").append(String.format("%.2f", budget.getRemainingBudget())).append("\n");
+                result.append(" | Remaining: $").append(String.format("%.2f",
+                        budget.getRemainingBudget())).append("\n");
                 index++;
             }
         }

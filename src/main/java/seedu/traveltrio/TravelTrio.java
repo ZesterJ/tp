@@ -133,12 +133,13 @@ public class TravelTrio {
 
                 case "budgetsummary":
                     ensureTripOpen();
-                    System.out.println(new BudgetSummaryCommand(openTrip.getBudgets(), openTrip.getActivities()).execute());
+                    System.out.println(new BudgetSummaryCommand(openTrip.getBudgets(),
+                            openTrip.getActivities()).execute());
                     break;
                 default:
                     System.out.println("Unknown command. Available commands: addtrip, listtrip, "
                             + "opentrip, deletetrip, addactivity, listactivity, "
-                            + "editactivity, deleteactivity, exit"); 
+                            + "editactivity, deleteactivity, addbudget, budgetsummary, exit"); 
                 }
             } catch (Exception e){
                 System.out.println("Error. " + e.getMessage());

@@ -15,13 +15,14 @@ public class ListActivityCommand extends ActivityCommand {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Itinerary for ").append(tripName).append(":\n\n");
+        sb.append("Itinerary for ").append(tripName).append(":\n");
 
         for (int i = 0; i < activityList.size(); i++) {
-            sb.append(i + 1)
+            sb.append("\n")
+                    .append(i + 1)
                     .append(". ")
                     .append(activityList.get(i).formatForList())
-                    .append("\n\n");
+                    .append("\n");
         }
 
         return sb.toString();

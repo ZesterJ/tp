@@ -73,4 +73,14 @@ public class Ui {
     public void showError(String message) {
         System.out.println("Error. " + message);
     }
+
+    public void printDivider(){
+        System.out.println("========================================================");
+    }
+
+    public void showMessageWithDivider(String message) {
+        printDivider();
+        System.out.println(message);
+        printDivider();
+    }
 }

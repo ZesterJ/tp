@@ -31,6 +31,6 @@ public class AddActivityCommand extends ActivityCommand{
             throw new TravelTrioException(overlapWarning);
         }
 
-        return "Activity added to " + tripName + ":\n\n" + a + "\n";
+        return "Activity added to " + tripName + ":\n\n" + a;
     }
 }

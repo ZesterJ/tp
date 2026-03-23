@@ -90,7 +90,7 @@ public class CommandProcessor {
 
     private void handleBudgetSummary() throws TravelTrioException {
         ensureTripOpen();
-        ui.showMessage(new BudgetSummaryCommand(openTrip.getBudgets(),
+        ui.showMessageWithDivider(new BudgetSummaryCommand(openTrip.getBudgets(),
                 openTrip.getActivities()).execute());
     }
 
@@ -162,7 +162,7 @@ public class CommandProcessor {
         }
         String resultString = new ListExpenseCommand(openTrip).execute();
 
-        ui.showMessage(resultString);
+        ui.showMessageWithDivider(resultString);
     }
 
     private void handleDeleteActivity() throws TravelTrioException {
@@ -183,7 +183,7 @@ public class CommandProcessor {
         String newDate = ui.promptField("New Date (YYYY-MM-DD)");
         String newStartTime = ui.promptField("New Start Time (HH:MM)");
         String newEndTime = ui.promptField("New End Time (HH:MM)");
-        ui.showMessage(new EditActivityCommand(openTrip.getActivities(),
+        ui.showMessageWithDivider(new EditActivityCommand(openTrip.getActivities(),
                 activityIdx, newTitle, newLocation, newDate, newStartTime, newEndTime)
                 .execute(openTrip.getName()));
     }
@@ -194,7 +194,7 @@ public class CommandProcessor {
     }
 
     private void printActivityList() throws TravelTrioException {
-        ui.showMessage(new ListActivityCommand(openTrip.getActivities()).execute(openTrip.getName()));
+        ui.showMessageWithDivider(new ListActivityCommand(openTrip.getActivities()).execute(openTrip.getName()));
     }
 
     private void handleAddActivity() throws TravelTrioException {
@@ -214,7 +214,8 @@ public class CommandProcessor {
 
         String startTime = ui.promptField("Start Time (HH:MM)");
         String endTime = ui.promptField("End Time (HH:MM)");
-        ui.showMessage(new AddActivityCommand(openTrip.getActivities(),
+
+        ui.showMessageWithDivider(new AddActivityCommand(openTrip.getActivities(),
                 title, location, date, startTime, endTime)
                 .execute(openTrip.getName()));
     }
@@ -243,14 +244,14 @@ public class CommandProcessor {
     }
 
     private void printTripList() throws TravelTrioException {
-        ui.showMessage(new ListTripCommand(tripList).execute());
+        ui.showMessageWithDivider(new ListTripCommand(tripList).execute());
     }
 
     private void handleAddTrip() throws TravelTrioException {
         String name = ui.promptField("Trip Name");
         String start = ui.promptField("Start Date (YYYY-MM-DD)");
         String end = ui.promptField("End Date (YYYY-MM-DD)");
-        ui.showMessage(new AddTripCommand(tripList, name, start, end).execute());
+        ui.showMessageWithDivider(new AddTripCommand(tripList, name, start, end).execute());
     }
 
     private void handleHelp() {

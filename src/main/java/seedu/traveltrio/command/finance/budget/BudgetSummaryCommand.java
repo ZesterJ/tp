@@ -1,4 +1,4 @@
-package seedu.traveltrio.command.budget;
+package seedu.traveltrio.command.finance.budget;
 
 import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.activity.ActivityList;

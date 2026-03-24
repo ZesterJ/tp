@@ -17,7 +17,12 @@ import seedu.traveltrio.command.others.HelpCommand;
 import seedu.traveltrio.model.trip.Trip;
 import seedu.traveltrio.model.trip.TripList;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 public class CommandProcessor {
+    private static final Logger logger = Logger.getLogger(CommandProcessor.class.getName());
+
     private final TripList tripList;
     private final Ui ui;
     private Trip openTrip = null;
@@ -28,6 +33,7 @@ public class CommandProcessor {
     }
 
     public void process(String command) {
+        logger.log(Level.INFO, "Processing command: {0}", command);
         try {
             switch (command) {
             case "addtrip":
@@ -238,8 +244,10 @@ public class CommandProcessor {
 
         printTripList();
         int idx = ui.promptInt("Enter the number of the trip to open");
+        assert idx > 0 : "UI should have validated that idx is positive";
         openTrip = tripList.get(idx - 1);
         assert openTrip != null;
+        logger.log(Level.INFO, "Trip opened: {0}", openTrip.getName());
         ui.showMessage(new OpenTripCommand(tripList, idx).execute());
     }
 
@@ -248,9 +256,15 @@ public class CommandProcessor {
     }
 
     private void handleAddTrip() throws TravelTrioException {
+        logger.log(Level.INFO, "Entering handleAddTrip()");
         String name = ui.promptField("Trip Name");
         String start = ui.promptField("Start Date (YYYY-MM-DD)");
         String end = ui.promptField("End Date (YYYY-MM-DD)");
+
+        assert !name.isEmpty() && !start.isEmpty() && !end.isEmpty() : "UI returned empty fields";
+
+        logger.log(Level.INFO, "Successfully added trip: {0}", name);
+
         ui.showMessageWithDivider(new AddTripCommand(tripList, name, start, end).execute());
     }
 

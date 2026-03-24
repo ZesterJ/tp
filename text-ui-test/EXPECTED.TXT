@@ -7,6 +7,6 @@ Welcome to
     |_|_|  \__,_| \_/ \___||_|  |_|_|  |_|\___/ 
 
 How can I help you plan today?
-Commands: addtrip, listtrip, opentrip, deletetrip, addactivity, listactivity, editactivity, deleteactivity, addbudget, budgetsummary, help, exit
+Commands: addtrip, listtrip, opentrip, deletetrip, addactivity, listactivity, editactivity, deleteactivity, addbudget, budgetsummary, setexpense, listexpense, help, exit
 > 
 Goodbye! Happy Travels!

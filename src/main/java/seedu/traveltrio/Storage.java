@@ -30,8 +30,9 @@ public class Storage {
      * Loads the list of trips and activities from the txt file from the previous session.
      *
      * @return A populated TripList or an empty one if no file exists.
+     * @throws TravelTrioException if unable to read file.
      */
-    public TripList load() {
+    public TripList load() throws TravelTrioException {
         TripList trips = new TripList();
         try {
             File file = new File(filePath);
@@ -42,62 +43,83 @@ public class Storage {
             Scanner fileScanner = new Scanner(file);
             Trip currentTrip = null;
             Activity lastActivity = null;
+            String currentDate = "";
 
             while (fileScanner.hasNext()) {
-                String line = fileScanner.nextLine();
-                if (line.trim().isEmpty()) {
+                String line = fileScanner.nextLine().trim();
+
+                if (line.isEmpty() || line.startsWith("***") || line.startsWith("---")) {
+                    // Skip divider lines
                     continue;
                 }
 
-                String[] parts = line.split(" \\| ");
-                String type = parts[0];
-
-                switch (type) {
-                case "T":
-                    // Format: T | Name | Start | End
-                    currentTrip = new Trip(parts[1], parts[2], parts[3]);
-                    trips.add(currentTrip);
-                    lastActivity = null;
-                    break;
-
-                case "A":
-                    // Format: A | Title | Location | Date | Start | End
-                    assert currentTrip != null : "Storage Error: Activity found before any Trip was declared in file.";
-
-                    lastActivity = new Activity(parts[1], parts[2], parts[3], parts[4], parts[5]);
-                    currentTrip.getActivities().add(lastActivity);
-
-                    break;
-
-                case "B":
-                    // Format: B | totalAmount | amountSpent
-                    assert currentTrip != null : "Storage Error: Budget found without a Trip context.";
-                    assert lastActivity != null : "Storage Error: Budget found without a preceding Activity.";
-
-                    double total = Double.parseDouble(parts[1]);
-                    double spent = Double.parseDouble(parts[2]);
-
-                    Budget budget = new Budget(total, lastActivity);
-                    budget.setExpense(spent);
-                    currentTrip.getBudgets().addBudget(lastActivity, budget);
-
-                    break;
-                default:
-                    logger.log(Level.WARNING, "Unknown line type encountered in storage: " + type);
-                    break;
+                if (line.startsWith("Trip:")) {
+                    currentTrip = loadTripDetails(line, trips);
+                } else if (line.startsWith("=== Date:")) {
+                    currentDate = loadDates(line);
+                } else if (line.startsWith("Activity")) {
+                    assert currentTrip != null: "No trip open!";
+                    lastActivity = loadActivityDetails(fileScanner, currentDate, currentTrip);
+                } else if (line.contains("Budget set:")) {
+                    assert currentTrip != null: "No trip open!";
+                    loadBudgetDetails(lastActivity, line, fileScanner, currentTrip);
                 }
             }
             fileScanner.close();
         } catch (Exception e) {
-            System.out.println("Error loading data: " + e.getMessage());
+            logger.log(Level.WARNING, "Failed to load trips from " + filePath, e);
+            throw new TravelTrioException("Error reading file. File might be corrupted.");
         }
         return trips;
+    }
+
+    private static void loadBudgetDetails(Activity lastActivity, String line, Scanner fileScanner, Trip currentTrip) throws TravelTrioException {
+        assert lastActivity != null : "Storage Error: " +
+                "Budget data found without a preceding Activity block.";
+
+        double total = Double.parseDouble(line.split(": ")[1].trim());
+        String expenseLine = fileScanner.nextLine(); // Read the next line for Actual Expense
+        double spent = Double.parseDouble(expenseLine.split(": ")[1].trim());
+
+        Budget budget = new Budget(total, lastActivity);
+        budget.setExpense(spent);
+
+        currentTrip.getBudgets().addBudget(lastActivity, budget);
+    }
+
+    private static Activity loadActivityDetails(Scanner fileScanner, String currentDate, Trip currentTrip) throws TravelTrioException {
+        Activity lastActivity;
+        String title = fileScanner.nextLine().split(": ")[1].trim();
+        String loc = fileScanner.nextLine().split(": ")[1].trim();
+        String start = fileScanner.nextLine().split(": ")[1].trim();
+        String end = fileScanner.nextLine().split(": ")[1].trim();
+
+        lastActivity = new Activity(title, loc, currentDate, start, end);
+        currentTrip.getActivities().add(lastActivity);
+        return lastActivity;
+    }
+
+    private static String loadDates(String line) {
+        String currentDate;
+        currentDate = line.replace("===", "").replace("Date:", "").trim();
+        return currentDate;
+    }
+
+    private static Trip loadTripDetails(String line, TripList trips) {
+        Trip currentTrip;
+        String[] parts = line.split(" \\| ");
+        String name = parts[0].substring(parts[0].indexOf(":") + 1).trim();
+        String start = parts[1].substring(parts[1].indexOf(":") + 1).trim();
+        String end = parts[2].substring(parts[2].indexOf(":") + 1).trim();
+        currentTrip = new Trip(name, start, end);
+        trips.add(currentTrip);
+        return currentTrip;
     }
 
     /**
      * Saves the current list of trips to the file.
      */
-    public void save(TripList trips) {
+    public void save(TripList trips) throws TravelTrioException {
         try {
             File file = new File(filePath);
             File directory = file.getParentFile();
@@ -110,10 +132,15 @@ public class Storage {
             for (int i = 0; i < trips.size(); i++) {
                 // Handles the T, A, and B lines
                 writer.write(trips.get(i).toFileFormat());
+
+                if (i < trips.size() - 1) {
+                    writer.write("\n\n\n");
+                }
             }
             writer.close();
         } catch (IOException e) {
-            System.out.println("Error saving data: " + e.getMessage());
+            logger.log(Level.WARNING, "Failed to save trips. " + e);
+            throw new TravelTrioException("Data not saved. Please check if the folder is read-only.");
         }
     }
 }

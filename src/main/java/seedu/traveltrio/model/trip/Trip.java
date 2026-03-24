@@ -24,23 +24,40 @@ public class Trip {
 
     public String toFileFormat() {
         StringBuilder sb = new StringBuilder();
+        double totalBudget = budgets.getTotalTripBudget();
 
         // Add trip details
-        sb.append(String.format("T | %s | %s | %s\n", name, startDate, endDate));
+        sb.append("***************************************************************************\n");
+        sb.append(String.format("Trip: %s | From: %s | To: %s | Total Budget: %.2f\n",
+                name, startDate, endDate, totalBudget));
+        sb.append("***************************************************************************\n");
+
+        String lastDate = "";
 
         for (int i = 0; i < activities.size(); i++) {
             Activity act = activities.get(i);
+            String currentDate = act.getDate();
+
+            // Day header if the date has changed
+            if (!currentDate.equals(lastDate)) {
+                sb.append("\n=== Date: ").append(currentDate).append(" ===\n");
+                sb.append("---------------------------------------------------------------------------\n");
+                lastDate = currentDate;
+            }
 
             // Add activity details
-            sb.append("A | ").append(act.toFileFormat()).append("\n");
+            sb.append(act.getName()).append("\n");
+            sb.append("    Location: ").append(act.getLocation()).append("\n");
+            sb.append("    Start Time: ").append(act.getStart()).append("\n");
+            sb.append("    End Time:   ").append(act.getEnd()).append("\n");
 
-            // Add budget details if it exists
+            // Add budget details
             Budget b = budgets.getBudget(act);
             if (b != null) {
-                // Format: B | Amount | ActualExpense
-                sb.append(String.format("B | %.2f | %.2f\n",
-                        b.getTotalBudget(), b.getAmountSpent()));
+                sb.append(String.format("      Budget set: %.2f\n", b.getTotalBudget()));
+                sb.append(String.format("      Actual Expense: %.2f\n", b.getAmountSpent()));
             }
+            sb.append("---------------------------------------------------------------------------\n");
         }
         return sb.toString();
     }

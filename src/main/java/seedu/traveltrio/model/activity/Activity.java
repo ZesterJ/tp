@@ -56,12 +56,6 @@ public class Activity {
         }
     }
 
-    public String toFileFormat() {
-        // Format: Title | Location | Date | Start | End
-        return String.format("%s | %s | %s | %s | %s",
-                name, location, date, start, end);
-    }
-
     public String getName() {
         return name;
     }

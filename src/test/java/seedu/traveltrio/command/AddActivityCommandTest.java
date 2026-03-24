@@ -14,7 +14,7 @@ class AddActivityCommandTest {
     //positive
     @Test
     void execute_activityListAndTripName_successfulMessage() throws TravelTrioException {
-        Trip trip = new Trip("Winter trip", "1 Oct", " Dec");
+        Trip trip = new Trip("Winter trip", "2026-05-01", "2026-07-30");
         ActivityList activityList = new ActivityList(trip);
         String tripName = "Japan Trip";
         AddActivityCommand addCommand = new AddActivityCommand(activityList,"Hiking at Mount Fuji",
@@ -26,8 +26,7 @@ class AddActivityCommandTest {
                 Hiking at Mount Fuji
                  Location: Mount Fuji
                  Date: 2026-06-28
-                 Time: 08:00 to 14:00
-                """, message);
+                 Time: 08:00 to 14:00""", message);
 
     }
 
@@ -45,8 +44,7 @@ class AddActivityCommandTest {
                 Hiking at Mount Fuji
                  Location: ---
                  Date: ---
-                 Time: ---
-                """, message);
+                 Time: ---""", message);
 
     }
 }

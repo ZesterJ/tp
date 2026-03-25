@@ -43,15 +43,40 @@ If the command input is invalid, or if no trip is currently opened, the command 
 The following sequence diagram shows how an operation to add an activity goes:
 ![img.png](diagrams/AddActivitySequenceDiagram.png)
 
+### Add Trip feature
+**Implementation**<br>
+The `addtrip` feature is facilitated by `AddTripCommand`. It allows the user to create a new `Trip` and add it to the `TripList`.
 
+The feature mainly involves the following classes:
+- AddTripCommand — adds a new Trip into the trip list.
+- Trip — represents a single trip with fields such as name, start date, and end date.
+- TripList — stores all Trip objects created by the user.
 
+The `AddTripCommand` receives the shared `TripList` and the trip details (name, start date, end date) to be added. 
+When `AddTripCommand#execute()` is called, the command validates the inputs, creates a new `Trip`, adds it to the list, and returns a success message.
 
+Given below is an example usage scenario and how the add trip mechanism behaves at each step.
 
+Step 1. The user starts the application. The application loads an existing `TripList`, which may initially be empty.
 
+Step 2. The user executes an `addtrip` command with the relevant trip details, such as trip name, start date, and end date.
 
+Step 3. The application collects the user input through the `Ui` and passes it to the `CommandProcessor`.
 
+Step 4. The application creates an `AddTripCommand`, passing in the current `TripList` and the provided trip details.
 
+Step 5. The user command is executed through `AddTripCommand#execute()`. The command validates that the name is not empty, the dates are provided, and that the start date is not later than the end date. A new `Trip` object is then created.
 
+Step 6. The command calls `TripList#add(trip)`, causing the new `trip` to be stored in the list.
+
+Step 7. A success message is returned to the user, showing that the trip has been successfully added.
+
+If the command input is invalid, the command will not be executed successfully and no trip will be added.
+
+**Sequence Diagram:**
+
+The following sequence diagram shows how an operation to add a trip goes:
+![img.png](diagrams/AddTripSequenceDiagram.png)
 
 
 ## Product scope

@@ -27,7 +27,7 @@ public class Ui {
         System.out.println("How can I help you plan today?");
         System.out.println("Commands: addtrip, listtrip, opentrip, deletetrip, "
                 + "addactivity, listactivity, editactivity, deleteactivity, addbudget, " +
-                "budgetsummary, setexpense, listexpense, help, exit");
+                "budgetsummary, setexpense, listexpense, setdailylimit, help, exit");
     }
 
     public String promptField(String label) {
@@ -75,7 +75,7 @@ public class Ui {
     }
 
     public void printDivider(){
-        System.out.println("========================================================");
+        System.out.println("===========================================================");
     }
 
     public void showMessageWithDivider(String message) {

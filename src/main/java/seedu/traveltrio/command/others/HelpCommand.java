@@ -21,8 +21,9 @@ public class HelpCommand {
                     + "--- Budget Commands (Requires an open trip) ---\n"
                     + "9. addbudget     : Assign a budget to a specific activity.\n"
                     + "10. setexpense   : Set the actual spending for a specific activity that has a budget.\n"
-                    + "11. budgetsummary: View a breakdown of expenses and remaining budget.\n\n"
-                    + "12. listexpense: compare budget and actual spending for activities, and show total spending"
+                    + "11. budgetsummary: View a breakdown of expenses and remaining budget.\n"
+                    + "12. listexpense  : compare budget and actual spending for activities, and show total spending.\n"
+                    + "13. setdailylimit: set a daily limit for expenses, warn users when limit exceeds.\n\n"
 
                     + "--- General Commands ---\n"
                     + "13. help         : Show this help menu.\n"

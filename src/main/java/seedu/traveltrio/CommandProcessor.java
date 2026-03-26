@@ -7,6 +7,7 @@ import seedu.traveltrio.command.activity.ListActivityCommand;
 import seedu.traveltrio.command.finance.budget.AddBudgetCommand;
 import seedu.traveltrio.command.finance.budget.BudgetSummaryCommand;
 import seedu.traveltrio.command.finance.expense.ListExpenseCommand;
+import seedu.traveltrio.command.finance.expense.SetDailyLimitCommand;
 import seedu.traveltrio.command.finance.expense.SetExpenseCommand;
 import seedu.traveltrio.command.trip.AddTripCommand;
 import seedu.traveltrio.command.trip.DeleteTripCommand;
@@ -35,7 +36,7 @@ public class CommandProcessor {
      * Constructs a CommandProcessor with a shared trip list and UI.
      *
      * @param tripList The global list of trips.
-     * @param ui User interface for interaction.
+     * @param ui       User interface for interaction.
      */
     public CommandProcessor(TripList tripList, Ui ui) {
         this.tripList = tripList;
@@ -87,6 +88,9 @@ public class CommandProcessor {
                 break;
             case "listexpense":
                 handleListExpense();
+                break;
+            case "setdailylimit":
+                handleSetDailyLimit();
                 break;
             case "help":
                 handleHelp();
@@ -148,17 +152,16 @@ public class CommandProcessor {
 
             try {
                 activityIdx = Integer.parseInt(input);
-
                 if (activityIdx < 1 || activityIdx > activities.size()) {
                     ui.showError("Selected activity index is out of range. Please enter a number from 1 to "
                             + activities.size() + ".");
                     continue;
                 }
-
                 break;
             } catch (NumberFormatException e) {
                 ui.showError("Please enter a valid activity number, or type 'exit' to cancel.");
             }
+
         }
 
         double actualAmount = ui.promptDouble("Enter amount ($)");
@@ -175,11 +178,11 @@ public class CommandProcessor {
 
     private void handleListExpense() throws TravelTrioException {
         ensureTripOpen();
-        if (openTrip.getActivities().isEmpty()){
+        if (openTrip.getActivities().isEmpty()) {
             ui.showMessage("You have not create any activities for your trip. No expenses to list.");
             return;
         }
-        if (openTrip.getBudgets().isEmpty()){
+        if (openTrip.getBudgets().isEmpty()) {
             ui.showMessage("You have not create any budget for your activities yet.");
             return;
         }
@@ -297,6 +300,20 @@ public class CommandProcessor {
         ui.showMessageWithDivider(new AddTripCommand(tripList, name, start, end).execute());
     }
 
+    /**
+     * Prompts the user to enter a daily spending limit for the currently opened trip,
+     * applies the new limit, and displays the result message.
+     *
+     * @throws TravelTrioException If no trip is currently open or if the entered
+     *                             daily limit is invalid.
+     */
+    private void handleSetDailyLimit() throws TravelTrioException {
+        ensureTripOpen();
+        double amount = ui.promptDouble("Enter daily spending limit to set: ");
+        String message = new SetDailyLimitCommand(openTrip.getBudgets(), amount).execute();
+        ui.showMessage(message);
+    }
+
     private void handleHelp() {
         ui.showMessage(new HelpCommand().execute());
     }
@@ -312,3 +329,4 @@ public class CommandProcessor {
         assert openTrip != null : "openTrip should not be null after check";
     }
 }
+

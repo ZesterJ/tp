@@ -143,7 +143,7 @@ public class CommandProcessor {
         int activityIdx;
         while (true) {
             String input = ui.promptField("Enter the activity number to set actual spending "
-                    + "(or type 'exit' to cancel): ");
+                    + "(or type 'exit' to cancel)");
 
             if (input.equalsIgnoreCase("exit")) {
                 ui.showMessage("Set expense cancelled.");
@@ -195,7 +195,7 @@ public class CommandProcessor {
         ensureTripOpen();
         printActivityList();
         int actIdx = ui.promptInt("Enter the number of the activity to delete");
-        ui.showMessage(new DeleteActivityCommand(openTrip.getActivities(), actIdx)
+        ui.showMessage(new DeleteActivityCommand(openTrip.getActivities(), openTrip.getBudgets(), actIdx)
                 .execute(openTrip.getName()));
     }
 

@@ -43,6 +43,40 @@ If the command input is invalid, or if no trip is currently opened, the command 
 The following sequence diagram shows how an operation to add an activity goes:
 ![img.png](diagrams/AddActivitySequenceDiagram.png)
 
+### Edit Activity feature 
+**Implementation**<br>
+The `editactivity` feature is facilitated by `EditActivityCommand`. It allows the user to modify the details of an existing `Activity` within the `ActivityList` of the currently opened `Trip`.
+
+The feature mainly involves the following classes:
+- EditActivityCommand — updates the specified fields of an existing Activity. 
+- Activity — represents a single activity whose fields (name, location, date, start time, end time) are being updated. 
+- ActivityList — stores all Activity objects belonging to a trip and is used to retrieve the target Activity.
+- Trip — owns the corresponding ActivityList.
+
+The `EditActivityCommand` receives the target `ActivityList` of the currently opened `Trip`, the index of the activity to edit and the new details to be updated.
+When `EditActivityCommand#execute()` is called, the target activity is retrieved, its specified fields are updated via setter methods, and a success message is returned.
+
+Given below is an example usage scenario and how the edit activity mechanism behaves at each step.
+
+Step 1. The user opens a trip, for example Japan Trip. The opened `Trip` contains an `ActivityList` with existing activities.
+
+Step 2. The user executes an `editactivity` command and is prompted to provide the index of the activity to edit, along with new details such as a new title, location, date, or time.
+
+Step 3. The application collects the user input, capturing the index and any new field values provided (leaving blank inputs as unchanged).
+
+Step 4. The application creates an `EditActivityCommand`, passing in the current trip’s `ActivityList`, the target index, and the newly provided details.
+
+Step 5. The user command is executed through `EditActivityCommand#execute()`. The command retrieves the target `Activity` from the list using the provided index and calls its respective setter methods for any non-empty fields.
+
+Step 6. A success message is returned to the user, showing that the activity has been successfully updated.
+
+If the command input is invalid (such as an out-of-bounds index), or if no trip is currently opened, the command will not be executed successfully and the activity will remain unchanged.
+
+**Sequence Diagram:**
+
+The following sequence diagram shows how an operation to edit an activity goes:
+![img.png](diagrams/EditActivitySequenceDiagram.png)
+
 ### Add Trip feature
 **Implementation**<br>
 The `addtrip` feature is facilitated by `AddTripCommand`. It allows the user to create a new `Trip` and add it to the `TripList`.

@@ -5,10 +5,10 @@ import seedu.traveltrio.model.budget.BudgetList;
 import seedu.traveltrio.model.activity.Activity;
 import seedu.traveltrio.model.budget.Budget;
 
-public class AddBudgetCommand extends BudgetCommand {
+public class SetBudgetCommand extends BudgetCommand {
     private final double totalBudget;
 
-    public AddBudgetCommand(BudgetList budgetList, ActivityList activityList, Activity activity, double totalBudget) {
+    public SetBudgetCommand(BudgetList budgetList, ActivityList activityList, Activity activity, double totalBudget) {
         super(budgetList, activityList , activity);
         this.totalBudget = totalBudget;
     }

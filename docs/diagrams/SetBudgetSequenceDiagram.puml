@@ -1,0 +1,42 @@
+@startuml
+actor User
+participant TravelTrio
+participant Ui
+participant CommandProcessor
+participant SetBudgetCommand
+participant BudgetList
+participant Activity
+participant Budget
+
+User -> TravelTrio : enter "setbudget"
+TravelTrio -> CommandProcessor : process("setbudget")
+
+CommandProcessor -> CommandProcessor : ensureTripOpen()
+CommandProcessor -> Ui : showMessage(activity list)
+Ui --> CommandProcessor : (activity selection acknowledge)
+CommandProcessor -> Ui : promptInt("Enter the number of the activity to add a budget for.")
+Ui --> CommandProcessor : activityIndex
+CommandProcessor -> Ui : promptDouble("Enter budget amount ($)")
+Ui --> CommandProcessor : budgetAmount
+
+create SetBudgetCommand
+CommandProcessor -> SetBudgetCommand : new SetBudgetCommand(openTrip.getBudgets(), openTrip.getActivities(), selectedActivity, budgetAmount)
+CommandProcessor -> SetBudgetCommand : execute()
+
+SetBudgetCommand -> SetBudgetCommand : validate activity != null
+
+create Budget
+SetBudgetCommand -> Budget : new Budget(budgetAmount, selectedActivity)
+Budget --> SetBudgetCommand : return newBudget
+
+SetBudgetCommand -> BudgetList : addBudget(selectedActivity, newBudget)
+BudgetList -> BudgetList : if existing budget -> adjust totalTripBudget
+BudgetList -> BudgetList : budgets.put(activity, newBudget)
+BudgetList -> BudgetList : totalTripBudget += newBudget.getActivityBudget()
+
+SetBudgetCommand --> CommandProcessor : "Added budget for ..."
+CommandProcessor -> Ui : showMessage(message)
+
+destroy SetBudgetCommand
+
+@enduml

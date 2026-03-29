@@ -112,6 +112,44 @@ If the command input is invalid, the command will not be executed successfully a
 The following sequence diagram shows how an operation to add a trip goes:
 ![img.png](diagrams/AddTripSequenceDiagram.png)
 
+### Set Budget feature
+**Implementation**<br>
+
+The `setbudget` feature is facilitated by `SetBudgetCommand`. It allows the user to add a budget for an existing `Activity` within the `ActivityList` of the currently opened `Trip`.
+
+The feature mainly involves the following classes:
+- SetBudgetCommand — adds a new Budget for the specified Activity.
+- Budget — represents the budget object for an activity.
+- BudgetList — stores all Budget objects for activities in a trip.
+- Activity — represents a single activity for which the budget is set.
+- ActivityList — stores all Activity objects belonging to a trip.
+- Trip — owns the corresponding ActivityList and BudgetList.
+- CommandProcessor — handles the user input, ensures a trip is open, and orchestrates the creation of the command.
+- Ui — handles all interactions with the user, such as prompting for the activity index and budget amount.
+
+The `SetBudgetCommand` receives the target `BudgetList`, `ActivityList`, the specific `Activity`, and the budget amount.
+When `SetBudgetCommand#execute()` is called, a new `Budget` is created and added to the `BudgetList` for the activity, and a success message is returned.
+
+Given below is an example usage scenario and how the set budget mechanism behaves at each step.
+
+Step 1. The user opens a trip, for example Japan Trip. The opened Trip contains an `ActivityList` with existing activities and a `BudgetList` which may be empty.
+
+Step 2. The user executes a `setbudget` command, followed by seeing the list of all current activities.
+
+Step 3. The application prompts the user to select an activity from the list and enter the budget amount.
+
+Step 4. The application creates a `SetBudgetCommand`, passing in the current trip’s `BudgetList`, `ActivityList`, the selected `Activity`, and the budget amount.
+
+Step 5. The user command is executed through `SetBudgetCommand#execute()`. The command creates a new `Budget` object and calls `BudgetList#addBudget(activity, budget)` to store it.
+
+Step 6. A success message is returned to the user, showing that the budget has been successfully added.
+
+If the command input is invalid, or if no trip is currently opened, the command will not be executed successfully and no budget will be added.
+
+**Sequence Diagram:**
+
+The following sequence diagram shows how an operation to set budget goes:
+<puml src="diagrams/SetBudgetSequenceDiagram.puml" />
 
 ## Product scope
 ### Target user profile

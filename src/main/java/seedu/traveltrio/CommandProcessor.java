@@ -4,7 +4,7 @@ import seedu.traveltrio.command.activity.AddActivityCommand;
 import seedu.traveltrio.command.activity.DeleteActivityCommand;
 import seedu.traveltrio.command.activity.EditActivityCommand;
 import seedu.traveltrio.command.activity.ListActivityCommand;
-import seedu.traveltrio.command.finance.budget.AddBudgetCommand;
+import seedu.traveltrio.command.finance.budget.SetBudgetCommand;
 import seedu.traveltrio.command.finance.budget.BudgetSummaryCommand;
 import seedu.traveltrio.command.finance.expense.ListExpenseCommand;
 import seedu.traveltrio.command.finance.expense.SetDailyLimitCommand;
@@ -77,8 +77,8 @@ public class CommandProcessor {
             case "deleteactivity":
                 handleDeleteActivity();
                 break;
-            case "addbudget":
-                handleAddBudget();
+            case "setbudget":
+                handleSetBudget();
                 break;
             case "budgetsummary":
                 handleBudgetSummary();
@@ -120,7 +120,7 @@ public class CommandProcessor {
                 openTrip.getActivities()).execute());
     }
 
-    private void handleAddBudget() throws TravelTrioException {
+    private void handleSetBudget() throws TravelTrioException {
         ensureTripOpen();
         if (openTrip.getActivities().isEmpty()) {
             throw new TravelTrioException("No activities found. Please add an activity before setting a budget.");
@@ -128,7 +128,7 @@ public class CommandProcessor {
         printActivityList();
         int budgetActivityIdx = ui.promptInt("Enter the number of the activity to add a budget for. ");
         double budgetAmount = ui.promptDouble("Enter budget amount ($)");
-        ui.showMessage(new AddBudgetCommand(openTrip.getBudgets(),
+        ui.showMessage(new SetBudgetCommand(openTrip.getBudgets(),
                 openTrip.getActivities(), openTrip.getActivities().get(budgetActivityIdx - 1), budgetAmount)
                 .execute());
     }

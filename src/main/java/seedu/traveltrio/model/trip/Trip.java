@@ -30,8 +30,8 @@ public class Trip {
 
         // Add trip details
         sb.append("***************************************************************************\n");
-        sb.append(String.format("Trip: %s | From: %s | To: %s | \nTotal Budget: %.2f | Remaining Budget: %.2f | Exchange Rate: %.2f \n",
-                name, startDate, endDate, totalBudget, remainingBudget, exchangeRate));
+        sb.append(String.format("Trip: %s | From: %s | To: %s | \nTotal Budget: %.2f | Remaining Budget: %.2f "
+                + "| Exchange Rate: %.2f \n", name, startDate, endDate, totalBudget, remainingBudget, exchangeRate));
         sb.append("***************************************************************************\n");
 
         String lastDate = "";

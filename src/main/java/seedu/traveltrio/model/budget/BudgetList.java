@@ -28,8 +28,12 @@ public class BudgetList {
     }
 
     public void addBudget(Activity activity, Budget budget) {
+        if (budgets.containsKey(activity)) {
+            Budget existingBudget = budgets.get(activity);
+            totalTripBudget -= existingBudget.getActivityBudget();
+        } 
         budgets.put(activity, budget);
-        totalTripBudget += budget.getTotalBudget();
+        totalTripBudget += budget.getActivityBudget();
     }
 
     public void removeBudget(Activity activity) {
@@ -37,7 +41,7 @@ public class BudgetList {
         if (activityBudget == null){
             return;
         }
-        totalTripBudget -= activityBudget.getTotalBudget();
+        totalTripBudget -= activityBudget.getActivityBudget();
         totalTripExpense -= activityBudget.getActualExpense();
 
         budgets.remove(activity);

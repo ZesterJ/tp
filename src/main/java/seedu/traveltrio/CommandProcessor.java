@@ -196,7 +196,7 @@ public class CommandProcessor {
         printActivityList();
         int actIdx = ui.promptInt("Enter the number of the activity to delete");
         ui.showMessage(new DeleteActivityCommand(openTrip.getActivities(), openTrip.getBudgets(), actIdx)
-                .execute(openTrip.getName()));
+                .run(openTrip.getName()));
     }
 
     private void handleEditActivity() throws TravelTrioException {
@@ -211,7 +211,7 @@ public class CommandProcessor {
         String newEndTime = ui.promptField("New End Time (HH:MM)");
         ui.showMessageWithDivider(new EditActivityCommand(openTrip.getActivities(),
                 activityIdx, newTitle, newLocation, newDate, newStartTime, newEndTime)
-                .execute(openTrip.getName()));
+                .run(openTrip.getName()));
     }
 
     private void handleListActivity() throws TravelTrioException {
@@ -220,7 +220,7 @@ public class CommandProcessor {
     }
 
     private void printActivityList() throws TravelTrioException {
-        ui.showMessage(new ListActivityCommand(openTrip.getActivities()).execute(openTrip.getName()));
+        ui.showMessage(new ListActivityCommand(openTrip.getActivities()).run(openTrip.getName()));
     }
 
     /**
@@ -250,7 +250,7 @@ public class CommandProcessor {
 
         ui.showMessageWithDivider(new AddActivityCommand(openTrip.getActivities(),
                 title, location, date, startTime, endTime)
-                .execute(openTrip.getName()));
+                .run(openTrip.getName()));
     }
 
     private void handleDeleteTrip() throws TravelTrioException {

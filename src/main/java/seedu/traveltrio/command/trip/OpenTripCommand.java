@@ -18,6 +18,15 @@ public class OpenTripCommand extends TripCommand {
             throw new TravelTrioException("Invalid trip index.");
         }
         Trip tripToOpen = tripList.get(index);
+        
+        // Close any currently open trip
+        for (int i = 0; i < tripList.size(); i++) {
+            Trip trip = tripList.get(i);
+            if (trip.isOpen()) {
+                trip.setOpen(false);
+            }
+        }
+        
         tripToOpen.setOpen(true);
         return "Opened trip: " + tripToOpen.toString();
     }

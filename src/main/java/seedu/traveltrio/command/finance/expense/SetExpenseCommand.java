@@ -17,7 +17,13 @@ public class SetExpenseCommand extends ExpenseCommand{
     @Override
     public String execute() throws TravelTrioException {
         budgetList.setExpense(activity, amount);
-        return "Expense set for activity: " + activity.getName() +
+        double activityBudget = budgetList.getBudget(activity).getActivityBudget();
+        double percentageSpent = (activityBudget == 0) ? 0 : (amount / activityBudget) * 100;
+        String result = "Expense set for activity: " + activity.getName() +
                 ". \nActual spending: $" + String.format("%.2f", amount);
+        if (percentageSpent >= 90) {
+            result += "\n(Warning: You have spent " + String.format("%.1f", percentageSpent) + "% of the budget!)";
+        }
+        return result;
     }
 }

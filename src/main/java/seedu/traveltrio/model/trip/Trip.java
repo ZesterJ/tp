@@ -55,7 +55,7 @@ public class Trip {
             // Add budget details
             Budget b = budgets.getBudget(act);
             if (b != null) {
-                sb.append(String.format("      Budget set: %.2f\n", b.getTotalBudget()));
+                sb.append(String.format("      Budget set: %.2f\n", b.getActivityBudget()));
                 sb.append(String.format("      Actual Expense: %.2f\n", b.getActualExpense()));
             }
             sb.append("---------------------------------------------------------------------------\n");

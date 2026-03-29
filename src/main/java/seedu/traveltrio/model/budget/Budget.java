@@ -4,21 +4,21 @@ import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.activity.Activity;
 
 public class Budget {
-    private double totalBudget;
+    private double activityBudget;
     private double actualExpense;
     private final Activity activity;
 
-    public Budget(double totalBudget, Activity activity) throws TravelTrioException {
-        if (totalBudget < 0) {
-            throw new TravelTrioException("Total budget cannot be negative.");
+    public Budget(double activityBudget, Activity activity) throws TravelTrioException {
+        if (activityBudget < 0) {
+            throw new TravelTrioException("Activity budget cannot be negative.");
         }
-        this.totalBudget = totalBudget;
+        this.activityBudget = activityBudget;
         this.actualExpense = 0;
         this.activity = activity;
     }
 
-    public double getTotalBudget() {
-        return totalBudget;
+    public double getActivityBudget() {
+        return activityBudget;
     }
 
     public double getActualExpense() {
@@ -26,7 +26,7 @@ public class Budget {
     }
 
     public double getRemainingBudget() {
-        return totalBudget - actualExpense;
+        return activityBudget - actualExpense;
     }
 
     public void setActualExpense(double amount) throws TravelTrioException {
@@ -34,15 +34,24 @@ public class Budget {
             throw new TravelTrioException("Expense amount cannot be negative.");
         }
         if (amount > getRemainingBudget()) {
-            throw new TravelTrioException("Expense exceeds remaining budget.");
+            throw new TravelTrioException("Expense exceeds remaining budget by " 
+                    + String.format("%.2f", amount - getRemainingBudget()) 
+                    + ". You must adjust the activity budget or reduce the expense amount.");
         }
         actualExpense = amount;
     }
 
     @Override
     public String toString() {
-        return String.format("Total Budget for %s: $%.2f, Amount Spent: $%.2f, Remaining: $%.2f",
-                activity.getName(), totalBudget, actualExpense, getRemainingBudget());
+        String result = String.format(
+                "%s\n   Total: $%.2f | Spent: $%.2f | Remaining: $%.2f",
+                activity.getName(), activityBudget, actualExpense, getRemainingBudget());
+
+        double percentageSpent = (activityBudget == 0) ? 0 : (actualExpense / activityBudget) * 100;
+        if (percentageSpent >= 90) {
+            result += "\n   (Warning: You have spent " + String.format("%.1f", percentageSpent) + "% of the budget!)";
+        }
+        return result;
     }
     
 }

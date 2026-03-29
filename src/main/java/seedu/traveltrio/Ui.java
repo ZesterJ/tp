@@ -15,9 +15,9 @@ public class Ui {
             + "    | | | | (_| |\\ V /  __/| |  | | |  | | (_) |\n"
             + "    |_|_|  \\__,_| \\_/ \\___||_|  |_|_|  |_|\\___/ \n";
 
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     private final Scanner in;
-    private final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private final static DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     public Ui () {
         this.in = new Scanner(System.in);

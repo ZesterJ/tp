@@ -65,7 +65,9 @@ public class CommandProcessorTest {
         provideInput("Korea\n2026-12-31\n2026-12-01\n2026-12-01\n2026-12-31\n");
         processor.process("addtrip");
 
-        assertEquals(0, tripList.size());
+        assertEquals(1, tripList.size());
+        assertEquals("Korea", tripList.get(0).getName());
+        assertEquals("2026-12-01", tripList.get(0).getStartDate());
     }
 
     @Test
@@ -115,7 +117,7 @@ public class CommandProcessorTest {
         processor.process("addactivity");
 
         assertEquals(1, trip.getActivities().size());
-        assertEquals(0, trip.getActivities().size());
+        assertEquals("Hiking", trip.getActivities().get(0).getName());
     }
 
     @Test

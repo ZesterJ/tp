@@ -26,7 +26,8 @@ public class HelpCommand {
                     + "13. setcurrency   : Update the exchange rate for converting foreign currency expenses to home"
                             + " currency.\n"
                     + "14. budgetsummary : View a breakdown of expenses and remaining budget.\n"
-                    + "15. listexpense   : compare budget and actual spending for activities, and show total spending.\n"
+                    + "15. listexpense   : compare budget and actual spending for activities, "
+                            + "and show total spending.\n"
                     + "16. setdailylimit : set a daily limit for expenses, warn users when limit exceeds.\n\n"
 
                     + "--- General Commands ---\n"

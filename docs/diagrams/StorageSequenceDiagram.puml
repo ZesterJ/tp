@@ -13,7 +13,6 @@ alt file exists
     Storage -> Storage : parseFileToTripList(file)
     activate Storage
 
-    ' Fix 1: Points to the BOX
     Storage -> TripList**
     Storage -> Scanner**
 
@@ -31,11 +30,10 @@ alt file exists
         end
     end
 
-    ' Fix 2: Horizontal return arrow
     return trips
     deactivate Storage
 else file does not exist
-    Storage -> TripList** : create()
+    Storage -> TripList**
 end
 
 Storage --> Main : trips

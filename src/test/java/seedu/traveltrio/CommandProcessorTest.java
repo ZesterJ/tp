@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CommandProcessorTest {
     private TripList tripList;
     private Ui ui;
+    private Storage storage;
     private CommandProcessor processor;
     private final InputStream systemIn = System.in;
 
@@ -23,7 +24,8 @@ public class CommandProcessorTest {
         // Creating new objects before each test
         tripList = new TripList();
         ui = new Ui();
-        processor = new CommandProcessor(tripList, ui);
+        storage = new Storage("");
+        processor = new CommandProcessor(tripList, ui, storage);
     }
 
     @AfterEach
@@ -36,7 +38,7 @@ public class CommandProcessorTest {
         ByteArrayInputStream testIn = new ByteArrayInputStream(data.getBytes());
         System.setIn(testIn);
         ui = new Ui();
-        processor = new CommandProcessor(tripList, ui);
+        processor = new CommandProcessor(tripList, ui, storage);
     }
 
     @Test
@@ -58,12 +60,14 @@ public class CommandProcessorTest {
     }
 
     @Test
-    public void process_addTripWithInvalidDateOrder_tripNotAdded() {
+    public void process_addTripWithInvalidDateOrder_loopsUntilValid() {
         // Start date is AFTER end date
-        provideInput("Korea\n2026-12-31\n2026-12-01\n");
+        provideInput("Korea\n2026-12-31\n2026-12-01\n2026-12-01\n2026-12-31\n");
         processor.process("addtrip");
 
-        assertEquals(0, tripList.size());
+        assertEquals(1, tripList.size());
+        assertEquals("Korea", tripList.get(0).getName());
+        assertEquals("2026-12-01", tripList.get(0).getStartDate());
     }
 
     @Test
@@ -102,17 +106,18 @@ public class CommandProcessorTest {
     }
 
     @Test
-    public void process_addActivityDateFallsOutsideTripDates_fails() {
+    public void process_addActivityDateFallsOutsideTripDates_loopsUntilValid() {
         Trip trip = new Trip("Trip", "2027-01-01", "2027-01-02");
         tripList.add(trip);
 
-        String input = "1\n" + "Hiking\nForest\n2025-01-05\n09:00\n12:00\n";
+        String input = "1\n" + "Hiking\nForest\n2025-01-05\n2027-01-01\n09:00\n12:00\n";
         provideInput(input);
 
         processor.process("opentrip");
         processor.process("addactivity");
 
-        assertEquals(0, trip.getActivities().size());
+        assertEquals(1, trip.getActivities().size());
+        assertEquals("Hiking", trip.getActivities().get(0).getName());
     }
 
     @Test
@@ -142,7 +147,7 @@ public class CommandProcessorTest {
 
         processor.process("opentrip");
         processor.process("addactivity");
-        processor.process("addbudget");
+        processor.process("setbudget");
 
         assertEquals(0, trip.getBudgets().getBudgets().size());
     }

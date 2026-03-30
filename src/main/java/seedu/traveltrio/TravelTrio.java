@@ -36,7 +36,7 @@ public class TravelTrio {
             ui.showMessage("Loaded " + tripList.size() + " trips from memory.");
         }
 
-        CommandProcessor processor = new CommandProcessor(tripList, ui);
+        CommandProcessor processor = new CommandProcessor(tripList, ui, storage);
 
         while (true) {
             String command = ui.readCommand();

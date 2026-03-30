@@ -34,13 +34,48 @@ public class Storage {
      * @throws TravelTrioException if unable to read file.
      */
     public TripList load() throws TravelTrioException {
-        TripList trips = new TripList();
-
         File file = new File(filePath);
         if (!file.exists()) {
-            return trips;
+            return new TripList();
+        }
+        return parseFileToTripList(file);
+    }
+
+    public Trip importTrip(String fileName) throws TravelTrioException {
+        File file = new File(fileName);
+        if (!file.exists()) {
+            throw new TravelTrioException("File '" + fileName + "' not found. Make sure it is in the same folder.");
         }
 
+        TripList importedTrips = parseFileToTripList(file);
+
+        if (importedTrips.isEmpty()) {
+            throw new TravelTrioException("No valid trip data found in " + fileName);
+        }
+
+        return importedTrips.get(0); // Return the first trip found in the shared file
+    }
+
+    public void exportTrip(Trip trip, String fileName) throws TravelTrioException {
+        try {
+            File file = new File(fileName);
+            // Append .txt if the user forgot it
+            if (!fileName.endsWith(".txt")) {
+                file = new File(fileName + ".txt");
+            }
+
+            FileWriter writer = new FileWriter(file);
+            writer.write(trip.toFileFormat());
+            writer.close();
+
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Failed to export trip. " + e);
+            throw new TravelTrioException("Failed to export trip to " + fileName + ".");
+        }
+    }
+
+    private TripList parseFileToTripList(File file) throws TravelTrioException {
+        TripList trips = new TripList();
         try (Scanner fileScanner = new Scanner(file)) {
             Trip currentTrip = null;
             Activity lastActivity = null;
@@ -50,7 +85,6 @@ public class Storage {
                 String line = fileScanner.nextLine().trim();
 
                 if (line.isEmpty() || line.startsWith("***") || line.startsWith("---")) {
-                    // Skip divider lines
                     continue;
                 }
 
@@ -67,12 +101,11 @@ public class Storage {
                     assert currentTrip != null: "No trip open!";
                     loadBudgetDetails(lastActivity, line, fileScanner, currentTrip);
                 } else if (!line.startsWith("Total Budget:")){
-                    ui.showError("Line wrongly formatted found. [" + line + "]. Check formatting before continuing.");
+                    ui.showError("Line wrongly formatted found. [" + line + "]. Check formatting.");
                 }
             }
-            fileScanner.close();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to load trips from " + filePath, e);
+            logger.log(Level.WARNING, "Failed to load trips from " + file.getPath(), e);
             throw new TravelTrioException("Error reading file. File might be corrupted.");
         }
         return trips;
@@ -134,7 +167,6 @@ public class Storage {
                 }
             }
         }
-
         return currentTrip;
     }
 

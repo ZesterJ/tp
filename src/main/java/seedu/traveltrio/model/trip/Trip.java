@@ -6,8 +6,10 @@ import seedu.traveltrio.model.budget.Budget;
 import seedu.traveltrio.model.budget.BudgetList;
 
 public class Trip {
-    public static final String TRIP_DIVIDER_LINE = "***************************************************************************";
-    public static final String ACTIVITY_DIVIDER_LINE = "---------------------------------------------------------------------------";
+    public static final String TRIP_DIVIDER_LINE =
+            "***************************************************************************";
+    public static final String ACTIVITY_DIVIDER_LINE =
+            "---------------------------------------------------------------------------";
     private String name;
     private String startDate;
     private String endDate;

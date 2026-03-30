@@ -33,9 +33,9 @@ public class Budget {
         if (amount < 0) {
             throw new TravelTrioException("Expense amount cannot be negative.");
         }
-        if (amount > getRemainingBudget()) {
-            throw new TravelTrioException("Expense exceeds remaining budget by " 
-                    + String.format("%.2f", amount - getRemainingBudget()) 
+        if (amount > getActivityBudget()) {
+            throw new TravelTrioException("Expense exceeds activity budget by " 
+                    + String.format("%.2f", amount - getActivityBudget()) 
                     + ". You must adjust the activity budget or reduce the expense amount.");
         }
         actualExpense = amount;

@@ -1,4 +1,5 @@
 @startuml
+hide footbox
 actor User
 participant TravelTrio
 participant Ui

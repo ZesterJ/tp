@@ -150,7 +150,7 @@ If the command input is invalid, or if no trip is currently opened, the command 
 **Sequence Diagram:**
 
 The following sequence diagram shows how an operation to set budget goes:
-<puml src="diagrams/SetBudgetSequenceDiagram.puml" />
+![img.png](diagrams/SetBudgetSequenceDiagram.png)
 
 ### Storage Component
 **Implementation**<br>
@@ -213,13 +213,18 @@ TravelTrio provides a high-speed, distraction-free environment for itinerary man
 |--------|-----------------------|-------------------------------------------------------------------------------|----------------------------------------------------------------------|
 |v1.0| new user              | see usage instructions                                                        | refer to them when I forget how to use the application               |
 |v1.0| Organized user        | view all acitivities that I had added to the activity list at once            | see all of the activities i had planned for my trip                  |
-|v1.0| Organized user        | add activities to a trip with details (e.g., activity name, time and location | append new activity to my list of activities in the itinerary        |
+|v1.0| Organized user        | add activities to a trip with details (e.g., activity name, time and location) | append new activity to my list of activities in the itinerary        |
+|v1.0| Organized User        | see a summary of all my trips and their key dates                              | quickly review my upcoming trips                                     |
 |v2.0| Thrifty User          | record my actual spending for planned activities                              | easily track and compare my actual expenses against my planned budget |
-
-
+|v2.0| Thrifty User          | allocate budget for individual activities or travel destinations              | track and plan my expected spending                                   |
+|v2.0| Thrifty User          | see a summary of my planned spending and remaining budget                     | make informed decisions about adding new activities or expenses       |
+|v2.0| Thrifty User          | receive alerts when my planned or actual spending approaches my budget limit  | avoid overspending during my trip                                     |
+|v2.0| Thrifty User          | set a "Daily Limit"                                                           | I don't end up spending all the money in a few days                   |
 ## Non-Functional Requirements
 
-{Give non-functional requirements}
+- The software must function as a lightweight, offline-first application.
+- The application must save data hierarchically to a local text file (e.g., data/traveltrio.txt) allowing data to persist across sessions.
+- The application must operate through a Command Line Interface (CLI) rather than a traditional GUI.
 
 ## Glossary
 
@@ -227,4 +232,163 @@ TravelTrio provides a high-speed, distraction-free environment for itinerary man
 
 ## Instructions for manual testing
 
-{Give instructions on how to do a manual product testing e.g., how to load sample data to be used for testing}
+### Initial Setup
+
+#### Option 1: Run from JAR (Recommended for End-User Testing)
+1. Build the application using Gradle: `./gradlew shadowJar` (on macOS/Linux) or `gradlew.bat shadowJar` (on Windows)
+2. Navigate to `build/libs/` and locate `traveltrio.jar`
+3. Copy `traveltrio.jar` to a clean test directory (e.g., `test_home/`)
+4. Open a terminal, navigate to `test_home/`, and run: `java -jar traveltrio.jar`
+5. The application will create a `data/` folder automatically if it doesn't exist
+
+#### Option 2: Run from Source (for Development Testing)
+1. Open the project in your IDE or terminal
+2. Run: `./gradlew run` (on macOS/Linux) or `gradlew.bat run` (on Windows)
+3. The application will start and use the existing `data/traveltrio.txt` file
+
+### Loading Sample Data
+
+#### Quick Sample Data (Non-emptying Existing Data)
+**Note:** If you want to preserve existing test data, skip to the "Complete Test Scenarios" section instead.
+
+#### Resetting to Fresh State
+1. Locate the `data/traveltrio.txt` file (next to the `.jar` or in the project root)
+2. Delete it or rename it to `traveltrio_backup.txt`
+3. Restart the application — it will create a fresh `data/traveltrio.txt` with no data
+4. You can now follow the test scenarios below to populate it gradually
+
+#### Pre-loading Sample Data (Alternative)
+1. Stop the application (press `Ctrl+C` or type `exit`)
+2. Create or replace `data/traveltrio.txt` with the following sample content:
+```
+***************************************************************************
+Trip: Japan Trip | From: 2026-03-15 | To: 2026-03-22 | 
+Total Budget: 3000.00 | Remaining Budget: 1250.00 | Exchange Rate: 1.50
+***************************************************************************
+
+=== Date: 2026-03-15 ===
+---------------------------------------------------------------------------
+Title: Flight to Tokyo
+    Location: SFO Airport
+    Start Time: 09:00
+    End Time:   22:00
+      Budget set: 800.00
+      Actual Expense: 800.00
+---------------------------------------------------------------------------
+
+Title: Check into Hotel
+    Location: Tokyo Hotel
+    Start Time: 23:00
+    End Time:   23:30
+      Budget set: 200.00
+      Actual Expense: 200.00
+---------------------------------------------------------------------------
+
+=== Date: 2026-03-16 ===
+---------------------------------------------------------------------------
+Title: Visit Senso-ji Temple
+    Location: Asakusa
+    Start Time: 09:00
+    End Time:   11:00
+      Budget set: 50.00
+      Actual Expense: 45.00
+---------------------------------------------------------------------------
+
+Title: Lunch at Tsukiji Market
+    Location: Tsukiji
+    Start Time: 12:00
+    End Time:   13:00
+      Budget set: 30.00
+      Actual Expense: 28.00
+---------------------------------------------------------------------------
+
+***************************************************************************
+Trip: Paris Escape | From: 2026-05-01 | To: 2026-05-05 | 
+Total Budget: 2000.00 | Remaining Budget: 2000.00 | Exchange Rate: 1.00
+***************************************************************************
+```
+3. Restart the application and verify that both trips appear when you type `listtrip`
+
+### Complete Test Scenarios
+
+#### Scenario 1: Trip Management
+1. **Add a new trip:** Type `addtrip` and follow the prompts to create a trip (e.g., "Summer Beach Vacation", 2026-06-01, 2026-06-10)
+2. **List all trips:** Type `listtrip` — verify your new trip appears in the list
+3. **Open a trip:** Type `opentrip` and select the trip you just created
+4. **Expected output:** The application should confirm which trip is now open
+
+#### Scenario 2: Activity Management
+1. Ensure a trip is open (from Scenario 1)
+2. **Add an activity:** Type `addactivity` and provide details (e.g., "Beach Day", "Sandy Beach", 2026-06-01, 09:00, 17:00)
+3. **Add another activity:** Type `addactivity` again with overlapping times (e.g., "Swimming Lesson", "Beach", 2026-06-01, 15:00, 16:00)
+   - **Expected:** Application should accept both activities without conflict warning (different activities on same day are allowed)
+4. **List activities:** Type `listactivity` — verify both activities appear in chronological order
+5. **Edit an activity:** Type `editactivity`, select an activity, and modify its location or time
+6. **Delete an activity:** Type `deleteactivity` and remove one activity — verify it's gone when you list again
+
+#### Scenario 3: Budget Management (if activity has no budget set)
+1. Ensure a trip is open with at least one activity
+2. **Set budget:** Type `setbudget`, select an activity, and enter a budget amount (e.g., 150.00)
+3. **Set expense (below budget):** Type `setexpense`, select the same activity, and enter an amount less than the budget (e.g., 100.00)
+   - **Expected:** Confirmation that expense is recorded successfully
+4. **Set expense (warning level):** Type `setexpense` again, entering an amount that brings total to 90% or more of budget (e.g., 40.00 more = 140.00 total)
+   - **Expected:** Warning message that expense is approaching budget limit
+5. **Attempt to exceed budget:** Type `setexpense` and try to enter an amount that would exceed the budget
+   - **Expected:** Application should reject the expense and prompt you to increase the budget first
+
+#### Scenario 4: Currency Conversion
+1. Ensure a trip is open
+2. **Set currency rate:** Type `setcurrency` and enter a foreign exchange rate (e.g., 1.50 for JPY to your home currency)
+3. **Check trip info:** Type `listtrip` — verify the exchange rate is stored for the trip
+4. **Set expense in foreign currency:** Type `setexpense` on an activity with budget set, and when prompted for currency, choose the foreign currency option
+   - Enter a foreign amount (e.g., 10000 JPY)
+   - **Expected:** The application converts to home currency (e.g., 6666.67 in home currency) and records the expense
+
+#### Scenario 5: Budget Summary and Expense Tracking
+1. Ensure a trip is open with multiple activities that have budgets and expenses set
+2. **View budget summary:** Type `budgetsummary`
+   - **Expected:** Displays total budget, total spent, remaining budget, and overspending alerts (if any)
+3. **View expense list:** Type `listexpense`
+   - **Expected:** Shows a chronological table of expenses grouped by date, with daily totals and daily limit warnings
+
+#### Scenario 6: Daily Spending Limit
+1. Ensure a trip is open
+2. **Set daily limit:** Type `setdailylimit` and enter a daily spending cap (e.g., 200.00)
+3. **Add activities with budgets for multiple days**
+4. **Try to exceed daily limit:** Type `setexpense` and attempt to log an expense that would breach the daily limit
+   - **Expected:** Application rejects the expense and alerts you to the daily limit breach
+5. **Verify limit tracking:** Type `listexpense` to see daily totals with limit indicators
+
+#### Scenario 7: Data Persistence
+1. Complete several operations (create trips, add activities, set budgets, log expenses)
+2. Type `exit` to save and close the application
+3. Restart the application (re-run the `.jar` or `./gradlew run`)
+4. Type `listtrip` and verify all your data is still present
+   - **Expected:** All trips, activities, budgets, and expenses persist
+
+#### Scenario 8: Trip Export and Import
+1. Ensure a trip is open
+2. **Export trip:** Type `exporttrip` and follow the prompt to save the trip to a `.txt` file (e.g., `exported_trip.txt`)
+3. **Verify export file:** Navigate to the directory and confirm `exported_trip.txt` was created with the expected format
+4. **Import trip (to same or different setup):** Type `importtrip` and select the exported file
+   - **Expected:** The trip is merged into the trip list with all activities and budgets intact
+
+#### Scenario 9: Error Handling & Edge Cases
+1. **Invalid date format:** Type `addtrip` and enter a date in wrong format (e.g., "01/01/2026" instead of "2026-01-01")
+   - **Expected:** Application rejects and re-prompts for correct format
+2. **Activity outside trip dates:** Ensure trip is open (dates 2026-03-15 to 2026-03-22) and type `addactivity` with a date outside this range (e.g., 2026-04-01)
+   - **Expected:** Application rejects the activity
+3. **No trip open:** Close/delete the open trip and try to add an activity
+   - **Expected:** Application prompts to open a trip first
+4. **Negative budget/expense:** Try to set a negative budget or expense
+   - **Expected:** Application rejects negative values
+
+#### Scenario 10: Help and Navigation
+1. Type `help` to view the command summary
+2. **Expected:** All major commands are listed with descriptions
+3. Type `opentrip` without an open trip to re-prompt
+4. Navigate through various commands and verify the step-by-step guidance is clear and helpful
+
+### Cleanup After Testing
+- Delete the `data/traveltrio.txt` file to reset to a clean state for the next test run
+- Optionally delete the entire `data/` folder if you want a completely fresh start

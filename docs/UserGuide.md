@@ -11,6 +11,17 @@ Whether you are planning a weekend getaway or a month-long backpacking trip, Tra
 4. Open a command terminal (e.g., Command Prompt on Windows, Terminal on macOS), navigate to the folder where you placed the `.jar` file, and run the following command: `java -jar traveltrio.jar`.
 5. You should see the TravelTrio welcome logo. Type `help` and press Enter to see the list of available commands to get started!
 
+### Date Format
+- Dates must be entered in `YYYY-MM-DD` format (e.g., `2026-05-01`).
+- Invalid formats will be rejected and you will be prompted to re-enter.
+
+### Time Format
+- Time must be entered in 24-hour format `HH:MM` (e.g., `14:30`).
+
+### Notes
+- TravelTrio uses precise date and time validation to ensure consistency.
+- All activities must fall within the trip’s start and end dates.
+
 ## Features 
 Unlike traditional CLI apps that force you to type long, complicated command strings, TravelTrio guides you step-by-step. Simply type the base command, and the app will prompt you for the required details!
 
@@ -25,10 +36,16 @@ Unlike traditional CLI apps that force you to type long, complicated command str
 
 2. **Smart Itinerary Planning**
     Build a detailed schedule for your open trip.
-   * Conflict Detection: When using `addactivity`, TravelTrio automatically checks for time overlaps. It won't let you book a museum tour at the same time as your flight!
    * Automatic Sorting: No matter what order you add them, `listactivity` displays your schedule chronologically.
    * Date Validation: The app ensures every activity falls within the start and end dates of your selected trip.
    * Easy Updates: Use `editactivity` to change locations or times without re-typing the entire entry. Leave a field blank to keep its current value.
+   * Conflict Detection:
+  - When using `addactivity`, TravelTrio automatically checks for time overlaps between activities.
+  - If a conflict is detected, the activity will not be added.
+  - This ensures that your itinerary remains realistic and executable.
+
+    **Example:**
+   If you already have an activity from `10:00` to `12:00`, adding another activity from `11:00` to `13:00` will be rejected.
 
 3. **Financial Tracking & Budgeting**
    Keep your travel expenses under control with integrated finance tools.

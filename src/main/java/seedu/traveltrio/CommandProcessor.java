@@ -201,6 +201,10 @@ public class CommandProcessor {
         ui.showMessage(successMessage);
     }
 
+    public String getOpenTripName() {
+        return openTrip == null ? null : openTrip.getName();
+    }
+
 
     private void handleListExpense() throws TravelTrioException {
         ensureTripOpen();

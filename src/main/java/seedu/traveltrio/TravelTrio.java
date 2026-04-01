@@ -39,7 +39,7 @@ public class TravelTrio {
         CommandProcessor processor = new CommandProcessor(tripList, ui, storage);
 
         while (true) {
-            String command = ui.readCommand();
+            String command = ui.readCommand(processor.getOpenTripName());
 
             if (command.equals("exit")) {
                 handleExit();

@@ -250,7 +250,10 @@ public class CommandProcessor {
     }
 
     private void printActivityList() throws TravelTrioException {
-        ui.showMessage(new ListActivityCommand(openTrip.getActivities()).run(openTrip.getName()));
+        String tripStartDate = openTrip.getStartDate();
+        String tripEndDate = openTrip.getEndDate();
+        ui.showMessage(new ListActivityCommand(openTrip.getActivities(), tripStartDate, tripEndDate)
+                .run(openTrip.getName()));
     }
 
     /**
@@ -271,7 +274,7 @@ public class CommandProcessor {
         String date;
 
         while (true) {
-            date = ui.promptField("Date (YYYY-MM-DD)");
+            date = ui.promptDate("Date");
             if (date.compareTo(tripStartDate) < 0 || date.compareTo(tripEndDate) > 0) {
                 ui.showError("Activity date is outside your trip dates ("
                         + tripStartDate + " to " + tripEndDate + "). Please enter a valid date.");
@@ -284,8 +287,8 @@ public class CommandProcessor {
         String endTime;
 
         while (true) {
-            startTime = ui.promptField("Start Time (HH:MM)");
-            endTime = ui.promptField("End Time (HH:MM)");
+            startTime = ui.promptTime("Start Time");
+            endTime = ui.promptTime("End Time");
             if (endTime.compareTo(startTime) < 0) {
                 ui.showError("End time cannot be earlier than start time. Let's try those times again.");
             } else {

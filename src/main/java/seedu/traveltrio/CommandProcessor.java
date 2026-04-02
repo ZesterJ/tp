@@ -234,11 +234,11 @@ public class CommandProcessor {
         printActivityList();
         int activityIdx = ui.promptInt("Enter the index of the activity to edit");
         ui.showMessage("Leave any field blank to keep current values.");
-        String newTitle = ui.promptField("New Title");
-        String newLocation = ui.promptField("New Location");
-        String newDate = ui.promptField("New Date (YYYY-MM-DD)");
-        String newStartTime = ui.promptField("New Start Time (HH:MM)");
-        String newEndTime = ui.promptField("New End Time (HH:MM)");
+        String newTitle = ui.promptOptionalField("New Title");
+        String newLocation = ui.promptOptionalField("New Location");
+        String newDate = ui.promptOptionalField("New Date (YYYY-MM-DD)");
+        String newStartTime = ui.promptOptionalField("New Start Time (HH:MM)");
+        String newEndTime = ui.promptOptionalField("New End Time (HH:MM)");
         ui.showMessageWithDivider(new EditActivityCommand(openTrip.getActivities(),
                 activityIdx, newTitle, newLocation, newDate, newStartTime, newEndTime)
                 .run(openTrip.getName()));

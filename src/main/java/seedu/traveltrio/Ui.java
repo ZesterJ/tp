@@ -50,7 +50,11 @@ public class Ui {
             }
             System.out.println("Input cannot be empty. Please try again.");
         }
+    }
 
+    public String promptOptionalField(String label) {
+        System.out.print(label + ": ");
+        return in.nextLine().trim();
     }
 
     public int promptInt(String label) {
@@ -83,7 +87,7 @@ public class Ui {
             String input = in.nextLine().trim();
             try {
                 LocalDate.parse(input, DATE_FORMATTER);
-                return input; // Success! It's a valid date.
+                return input; // It's a valid date.
             } catch (DateTimeParseException e) {
                 System.out.println("Invalid date format. Please use YYYY-MM-DD (e.g., 2026-12-25).");
             }
@@ -96,7 +100,7 @@ public class Ui {
             String input = in.nextLine().trim();
             try {
                 LocalTime.parse(input, TIME_FORMATTER);
-                return input; // Success! It's a valid time.
+                return input; // It's a valid time.
             } catch (DateTimeParseException e) {
                 System.out.println("Invalid time format. Please use 24-hour HH:MM (e.g., 14:30).");
             }

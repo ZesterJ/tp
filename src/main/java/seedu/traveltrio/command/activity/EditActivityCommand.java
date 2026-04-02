@@ -39,28 +39,26 @@ public class EditActivityCommand extends ActivityCommand{
 
         assert activity != null : "The activity to be edited should not be null.";
 
-        if (name != null) {
+        if (name != null && !name.isBlank()) {
             activity.setName(name);
         }
-        if (location != null) {
+        if (location != null && !location.isBlank()) {
             activity.setLocation(location);
         }
-        if (date != null) {
+        if (date != null && !date.isBlank()) {
             activity.setDate(date);
         }
-        if (start != null) {
+        if (start != null && !start.isBlank()) {
             activity.setStart(start);
         }
-        if (end != null) {
+        if (end != null && !end.isBlank()) {
             activity.setEnd(end);
         }
 
         if (name != null) {
             assert !activity.getName().isBlank() : "Activity name should not be blank after edit.";
         }
-        
         return "Activity updated:\n\n" + activity + "\n";
     }
-
 }
 

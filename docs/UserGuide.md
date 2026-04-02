@@ -312,9 +312,11 @@ Removes an activity from the itinerary.
 
 ### 3. Budget Management
 *Note: budget is assigned for an activity. Thus, the activity has to be created first before setting the activity budget.*
+*Note: All monetory values displayed are of the home currency of the user.*
 
 #### 3.1 Adding a Budget for an Activity
-Records the expected or planned cost of an activity
+Records the expected or planned cost of an activity. To change the budget for a specific activity, the same command is used with the new budget amount. To delete a budget, simply use the same command and set the budget for the activity to 0.
+
 * Format: `setbudget`
     * After entering the command, the application will prompt the user for inputs:
         * `Enter the index of the activity to add a budget for:`
@@ -366,6 +368,7 @@ Displays a comprehensive summary comparing your planned spending against your to
 #### 4.1 Set the Actual Expense for an Activity
 Records the actual amount spent on an activity. This allows users to compare the actual expense against the planned budget for each activity in budgetsummary.
 *Note: A budget must be added for an activity before its expense can be set.*
+*Note: The user needs to specify if home currency or foreign currency is being input. 1 for foreign currency and 0 for home currency*
 
 * Format: `setexpense`
   * After entering the command, the application will prompt the user for inputs:

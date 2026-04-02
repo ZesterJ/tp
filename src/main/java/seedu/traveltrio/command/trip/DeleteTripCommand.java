@@ -18,6 +18,8 @@ public class DeleteTripCommand extends TripCommand {
         }
         String removedTrip = tripList.get(index).toString();
         tripList.remove(index);
+        assert tripList.size() >= 0 : "Trip list size should not be negative after deletion.";
+
         return "Deleted trip: " + removedTrip;
     }
     

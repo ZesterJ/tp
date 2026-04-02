@@ -18,6 +18,13 @@ public class SetBudgetCommand extends BudgetCommand {
         if (activity == null) {
             throw new TravelTrioException("Please select an activity to add a budget for.");
         }
+        if (totalBudget < 0) {
+            throw new TravelTrioException("Total budget cannot be negative.");
+        }
+        if (totalBudget == 0) {
+            budgetList.removeBudget(activity);
+            return "Removed budget for " + activity.getName() + " as the total budget is set to $0.00.";
+        }
         Budget newBudget = new Budget(totalBudget, activity);
         budgetList.addBudget(activity, newBudget);
         return "Added budget for " + activity.getName() + ": $" + String.format("%.2f", totalBudget);

@@ -131,7 +131,7 @@ public class CommandProcessor {
     private void handleBudgetSummary() throws TravelTrioException {
         ensureTripOpen();
         ui.showMessageWithDivider(new BudgetSummaryCommand(openTrip.getBudgets(),
-                openTrip.getActivities()).execute());
+                openTrip.getActivities()).run());
     }
 
     private void handleSetBudget() throws TravelTrioException {
@@ -144,7 +144,7 @@ public class CommandProcessor {
         double budgetAmount = ui.promptDouble("Enter budget amount ($)");
         ui.showMessage(new SetBudgetCommand(openTrip.getBudgets(),
                 openTrip.getActivities(), openTrip.getActivities().get(budgetActivityIdx - 1), budgetAmount)
-                .execute());
+                .run());
     }
 
     private void handleSetCurrency() throws TravelTrioException {
@@ -153,7 +153,7 @@ public class CommandProcessor {
                 + openTrip.getBudgets().getExchangeRate() 
                 + " Home Currency.\nEnter the exchange rate (1 Foreign Currency = ? Home Currency)");
         ui.showMessage(new SetCurrencyCommand(openTrip.getBudgets(),
-                openTrip.getActivities(), null, exchangeRate).execute());
+                openTrip.getActivities(), null, exchangeRate).run());
     }
 
     private void handleSetExpense() throws TravelTrioException {

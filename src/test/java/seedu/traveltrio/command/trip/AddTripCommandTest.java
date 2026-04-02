@@ -3,7 +3,6 @@ package seedu.traveltrio.command.trip;
 import org.junit.jupiter.api.Test;
 
 import seedu.traveltrio.TravelTrioException;
-import seedu.traveltrio.model.trip.Trip;
 import seedu.traveltrio.model.trip.TripList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

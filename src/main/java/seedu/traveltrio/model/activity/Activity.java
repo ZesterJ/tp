@@ -4,6 +4,7 @@ import seedu.traveltrio.TravelTrioException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -18,6 +19,7 @@ public class Activity {
     private LocalDate date;
     private LocalTime start;
     private LocalTime end;
+    private LocalDate endDate;
 
 
     public Activity(String name, String location, String date, String start, String end) throws TravelTrioException {
@@ -27,8 +29,13 @@ public class Activity {
         this.start = parseTime(start, "Start time");
         this.end = parseTime(end, "End time");
 
-        if (this.start != null && this.end != null && !this.end.isAfter(this.start)) {
-            throw new TravelTrioException("End time must be after start time.");
+        if (this.start != null && this.end != null) {
+            if (!this.end.isAfter(this.start)) {
+                // end <= start means activity crosses midnight into the next day
+                this.endDate = this.date != null ? this.date.plusDays(1) : null;
+            } else {
+                this.endDate = this.date;
+            }
         }
     }
 
@@ -112,8 +119,16 @@ public class Activity {
                 || other.start == null || other.end == null) {
             return false;
         }
-        return this.start.isBefore(other.end) && other.start.isBefore(this.end);
-    }
+       LocalDate thisEndDate = this.endDate != null ? this.endDate : this.date;
+       LocalDate otherEndDate = other.endDate != null ? other.endDate : other.date;
+
+       LocalDateTime thisStart = LocalDateTime.of(this.date, this.start);
+       LocalDateTime thisEnd = LocalDateTime.of(thisEndDate, this.end);
+       LocalDateTime otherStart = LocalDateTime.of(other.date, other.start);
+       LocalDateTime otherEnd = LocalDateTime.of(otherEndDate, other.end);
+
+       return thisStart.isBefore(otherEnd) && otherStart.isBefore(thisEnd);
+   }
 
     @Override
     public String toString() {

@@ -22,6 +22,8 @@ import seedu.traveltrio.model.trip.Trip;
 import seedu.traveltrio.model.trip.TripList;
 
 import java.util.logging.Logger;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 
 /**
@@ -286,13 +288,16 @@ public class CommandProcessor {
         String startTime;
         String endTime;
 
-        while (true) {
-            startTime = ui.promptTime("Start Time");
-            endTime = ui.promptTime("End Time");
-            if (endTime.compareTo(startTime) < 0) {
-                ui.showError("End time cannot be earlier than start time. Let's try those times again.");
-            } else {
-                break;
+        startTime = ui.promptTime("Start Time");
+        endTime = ui.promptTime("End Time");
+
+        LocalTime st = LocalTime.parse(startTime, DateTimeFormatter.ofPattern("HH:mm"));
+        LocalTime et = LocalTime.parse(endTime, DateTimeFormatter.ofPattern("HH:mm"));
+
+        if (!et.isAfter(st)) {
+            String confirm = ui.promptField("End time is before start time. Does this activity cross midnight? (y/n)");
+            if (!confirm.equalsIgnoreCase("y")) {
+                throw new TravelTrioException("End time must be after start time.");
             }
         }
 

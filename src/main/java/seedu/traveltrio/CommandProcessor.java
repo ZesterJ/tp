@@ -1,5 +1,6 @@
 package seedu.traveltrio;
 
+import seedu.traveltrio.command.activity.AddRemarkCommand;
 import seedu.traveltrio.command.activity.AddActivityCommand;
 import seedu.traveltrio.command.activity.DeleteActivityCommand;
 import seedu.traveltrio.command.activity.EditActivityCommand;
@@ -111,6 +112,9 @@ public class CommandProcessor {
             case "help":
                 handleHelp();
                 break;
+            case "addremark":
+                handleAddRemark();
+                break;
             default:
                 handleUnknownCommand();
             }
@@ -126,7 +130,7 @@ public class CommandProcessor {
     private void handleUnknownCommand() {
         ui.showError("Unknown command.\n"
                 + "Available commands: addtrip, listtrip, opentrip, deletetrip,\n"
-                + "addactivity, listactivity, editactivity, deleteactivity,\n"
+                + "addactivity, listactivity, editactivity, deleteactivity, addremark\n"
                 + "setbudget, setexpense, setcurrency, budgetsummary, help, exit");
     }
 
@@ -407,6 +411,26 @@ public class CommandProcessor {
             throw new TravelTrioException("You need to open a trip first. (Use 'opentrip')");
         }
         assert openTrip != null : "openTrip should not be null after check";
+    }
+
+    private void handleAddRemark() throws TravelTrioException{
+        ensureTripOpen();
+         if (openTrip.getActivities().isEmpty()) {
+            throw new TravelTrioException("No activities found. Please add an activity before adding a remark.");
+         }
+
+        printActivityList();
+
+        int index = ui.promptInt("Enter the index of the activity to add a remark for");
+        String remark = ui.promptField("Enter the remark to add");
+
+        String result = new AddRemarkCommand(
+            openTrip.getActivities(),
+            index,
+            remark
+        ).run(openTrip.getName());
+
+        ui.showMessageWithDivider(result);
     }
 }
 

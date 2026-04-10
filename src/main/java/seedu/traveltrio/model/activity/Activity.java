@@ -20,6 +20,7 @@ public class Activity {
     private LocalTime start;
     private LocalTime end;
     private LocalDate endDate;
+    private String remark = "";
 
 
     public Activity(String name, String location, String date, String start, String end) throws TravelTrioException {
@@ -103,6 +104,14 @@ public class Activity {
         this.end = parseTime(end, "End time");
     }
 
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
     public LocalTime getLocalStart() {
         return start;
     }
@@ -146,6 +155,10 @@ public class Activity {
         result += "   Date: " + (date != null ? date : "---") + "\n";
         result += "   Time: " + (start == null || end == null ? "---" : (start + " to " + end));
 
+        if (remark != null && !remark.isBlank()) {
+            result += "\n   Remark: " + remark;
+        }
+
         return result;
     }
 
@@ -156,7 +169,11 @@ public class Activity {
         String activityTime = (start == null || end == null)
                 ? "---"
                 : start.format(TIME_FORMATTER) + " to " + end.format(TIME_FORMATTER);
-        return String.format("%-3d | %-25s | %-15s | %-12s | %-18s",
-                index, activityName, activityLocation, activityDate, activityTime);
+        String activityRemark = (remark != null && !remark.isBlank())
+                ? remark
+                : "-";
+
+        return String.format("%-3d | %-20s | %-15s | %-12s | %-18s | %-20s",
+                index, activityName, activityLocation, activityDate, activityTime, activityRemark);
     }
 }

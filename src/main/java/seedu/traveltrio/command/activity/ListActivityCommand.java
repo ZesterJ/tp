@@ -24,8 +24,8 @@ public class ListActivityCommand extends ActivityCommand {
         sb.append("Itinerary for [").append(tripName).append("] (")
                 .append(tripStartDate).append(" -> ").append(tripEndDate).append("):\n");
 
-        String header = String.format("%-3s | %-25s | %-15s | %-12s | %-18s",
-                "No", "Activity", "Location", "Date", "Time");
+        String header = String.format("%-3s | %-20s | %-15s | %-12s | %-18s | %-20s",
+                "No", "Activity", "Location", "Date", "Time", "Remark");
         int dividerLength = header.length();
 
         sb.append(header).append("\n");

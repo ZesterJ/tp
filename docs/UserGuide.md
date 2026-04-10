@@ -417,9 +417,9 @@ Displays a visual chart showing how much of each activity's budget has been used
     ```text
     Budget Usage Chart:
 
-    Hiking        | ██████████---------- | 50%
-    Swimming      | ███████████████----- | 75%
-    Cycling       | ████████████████████ | 100%
+    Hiking        [##--------] 20%
+    Swimming      [###-------] 33%
+    Cycling       [#####-----] 50%
     ```
 <br>
 

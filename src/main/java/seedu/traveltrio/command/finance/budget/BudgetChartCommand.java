@@ -6,8 +6,6 @@ import seedu.traveltrio.model.budget.BudgetList;
 import seedu.traveltrio.model.activity.ActivityList;
 import seedu.traveltrio.model.activity.Activity;
 
-import java.util.Map;
-
 public class BudgetChartCommand extends BudgetCommand {
 
     private static final int BAR_LENGTH = 20;
@@ -18,34 +16,35 @@ public class BudgetChartCommand extends BudgetCommand {
 
     @Override
     public String execute() throws TravelTrioException {
-
         if (budgetList.isEmpty()) {
-            return "No budgets found. Please set a budget first.";
+            throw new TravelTrioException("No budgets found.");
         }
 
-        StringBuilder result = new StringBuilder();
-        result.append("Budget Usage Chart:\n\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Budget Usage Chart:\n");
 
-        for (Map.Entry<Activity, Budget> entry : budgetList.getBudgets().entrySet()) {
-
+        for (var entry : budgetList.getBudgets().entrySet()) {
             Activity activity = entry.getKey();
             Budget budget = entry.getValue();
 
             double total = budget.getActivityBudget();
             double spent = budget.getActualExpense();
 
-            double percentage = (total == 0) ? 0 : (spent / total);
-            int filledLength = (int) (percentage * BAR_LENGTH);
+            int percentage = (total == 0) ? 0 : (int) ((spent / total) * 100);
 
-            String bar = "█".repeat(filledLength)
-                    + "-".repeat(BAR_LENGTH - filledLength);
+            int filled = percentage / 10;
 
-            result.append(String.format("%-15s | %s | %3.0f%%\n",
+            String bar = "["
+                    + "#".repeat(filled)
+                    + "-".repeat(10 - filled)
+                    + "]";
+
+            sb.append(String.format("%-10s %s %d%%\n",
                     activity.getName(),
                     bar,
-                    percentage * 100));
+                    percentage));
         }
 
-        return result.toString();
+        return sb.toString();
     }
 }

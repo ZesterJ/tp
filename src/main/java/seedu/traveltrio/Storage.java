@@ -162,7 +162,7 @@ public class Storage {
         String[] parts = line.split(" \\| ");
         String name = parts[0].substring(parts[0].indexOf(":") + 1).trim();
         String start = parts[1].substring(parts[1].indexOf(":") + 1).trim();
-        String end = parts[2].substring(parts[2].indexOf(":") + 1).trim();
+        String end = parts[2].substring(parts[2].indexOf(":") + 1).replace("|", "").trim();
         currentTrip = new Trip(name, start, end);
         trips.add(currentTrip);
 

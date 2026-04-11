@@ -152,10 +152,13 @@ public class CommandProcessor {
     }
 
     private void handleUnknownCommand() {
-        ui.showError("Unknown command.\n"
-                + "Available commands: addtrip, listtrip, opentrip, deletetrip,\n"
-                + "addactivity, listactivity, editactivity, deleteactivity, addremark\n"
-                + "setbudget, setexpense, setcurrency, budgetsummary, help, exit");
+        ui.showError("Unknown command.\n" +
+                "Commands: \n" +
+                "addtrip, listtrip, opentrip, deletetrip, exporttrip, importtrip, \n" +
+                "addactivity, listactivity, editactivity, deleteactivity, nextactivity, addremark, \n" +
+                "setbudget, setexpense, setcurrency, setdailylimit, budgetsummary, listexpense, budgetchart, \n" +
+                "additem, listitems, checkitem, deleteitem, \n" +
+                "exit");
     }
 
     private void handleBudgetSummary() throws TravelTrioException {

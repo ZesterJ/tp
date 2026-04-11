@@ -6,13 +6,13 @@ Whether you are planning a weekend getaway or a month-long backpacking trip, Tra
 
 ## Quick Start
 1. Ensure that you have Java 17 or above installed.
-2. Download the latest version of `traveltrio.jar` from [traveltrio.jar](../build/libs/traveltrio.jar). 
+2. Download the latest version of `tp.jar` from our [GitHub Releases Page](https://github.com/AY2526S2-CS2113-F09-4/tp/releases). 
 3. Copy the file to the folder you want to use as the home folder for your travel plans.
-4. Open a command terminal (e.g., Command Prompt on Windows, Terminal on macOS), navigate to the folder where you placed the `.jar` file, and run the following command: `java -jar traveltrio.jar`.
+4. Open a command terminal (e.g., Command Prompt on Windows, Terminal on macOS), navigate to the folder where you placed the `.jar` file, and run the following command: `java -jar tp.jar`.
 5. You should see the TravelTrio welcome logo. Type `help` and press Enter to see the list of available commands to get started!
 6. The command prompt will display your current working context:
    * `> ` means no trip is currently open
-   * `[Trip Name] > ` means you are working within that trip
+   * `[Opened: <Trip Name>] > ` means you are working within that trip
 
 ### Date Format
 * Dates must be entered in `YYYY-MM-DD` format (e.g., `2026-05-01`).
@@ -81,7 +81,7 @@ Unlike traditional CLI apps that force you to type long, complicated command str
 Adds a new trip to user's travel planner
 * Format: `addtrip`
     * After entering the command, the application will prompt users for inputs:
-        * `Trip name`
+        * `Trip Name:`
         * Start date in `YYYY-MM-DD` format
         * End date in `YYYY-MM-DD` format
 * Example usage:
@@ -121,7 +121,7 @@ Displays all trips
 <br>
 
 #### 1.3 Open a Trip to edit
-Sets a trip as the active working trip, to allow users to add edit the opened trip's itinerary.
+Sets a trip as the active working trip, to allow users to edit the opened trip's itinerary.
 
 * Format: `opentrip`
   * After entering the command, the application will prompt users for inputs:
@@ -207,14 +207,15 @@ Imports a trip schedule and its budget details from a provided text file into yo
 *Note: a trip has to be "opened" by the user, in order to perform the following commands*
 
 #### 2.1 Adding an Activity
-Adds a new activity to the current trip's itinerary*
+Adds a new activity to the current trip's itinerary
 * Format: `addactivity`
     * After entering the command, the application will prompt the user for the required activity details.
     * Prompt user for inputs:
         * `Activity Title:`
         * `Location: `
-        * Start date in `yyyy-MM-dd` format
-        * End date in `yyyy-MM-dd` format
+        * Date in `YYYY-MM-DD` format
+        * Start time in `HH:MM` format
+        * End time in `HH:MM` format
 * Example usage:
     ```text
     > addactivity
@@ -344,7 +345,7 @@ Removes an activity from the itinerary.
 <br>
 
 ### 2.5 Display Next Activity
-Display the next closet activity that would happen
+Display the next closest activity that would happen
 * Format: `nextactivity`
 * Example Usage:
     ```text
@@ -368,7 +369,7 @@ Display the next closet activity that would happen
 
 ### 3. Budget Management
 *Note: budget is assigned for an activity. Thus, the activity has to be created first before setting the activity budget.*
-*Note: All monetory values displayed are of the home currency of the user.*
+*Note: All monetary values displayed are of the home currency of the user.*
 
 #### 3.1 Adding a Budget for an Activity
 Records the expected or planned cost of an activity. To change the budget for a specific activity, the same command is used with the new budget amount. To delete a budget, simply use the same command and set the budget for the activity to 0.
@@ -493,7 +494,7 @@ Sets a daily spending limit for the currently opened trip. This allows users to 
 
 * Format: setdailylimit
   * After entering the command, the application will prompt the user for inputs:
-    * Enter daily spending limit to set:
+    * `Enter daily spending limit to set ($):`
 
 * Example usage:
     ```text
@@ -501,6 +502,7 @@ Sets a daily spending limit for the currently opened trip. This allows users to 
     ```
 * Expected result: 
     ```text
+    > setdailylimit
     Daily spending limit has been set to $500.00.
     ``` 
 <br>
@@ -604,27 +606,30 @@ You must keep the exact prefixes (like `Trip:` or `Title:`) and avoid adding emp
 
 ## Command Summary
 
-| Category        | Command          | Description                                         |
-|:----------------|:-----------------|:----------------------------------------------------|
-| **Trip**        | `addtrip`        | Create a new trip.                                  |
-|                 | `listtrip`       | View a list of all your planned trips.              |
-|                 | `opentrip`       | Open a specific trip to manage it.                  |
-|                 | `deletetrip`     | Permanently delete a trip.                          |
-|                 | `exporttrip`     | Export a trip to a text file for sharing.           |
-|                 | `importtrip`     | Import a shared trip from a text file.              |
-| **Activity**    | `addactivity`    | Add an event to the open trip.                      |
-|                 | `listactivity`   | View the itinerary for the open trip.               |
-|                 | `editactivity`   | Modify details of an existing activity.             |
-|                 | `deleteactivity` | Remove an activity from the itinerary.              |
-| **Budget**      | `setbudget`      | Allocate funds for an activity.                     |
-|                 | `setexpense`     | Log actual spending for an activity.                |
-|                 | `setcurrency`    | Set the foreign exchange rate.                      |
-|                 | `setdailylimit`  | Set a maximum daily spending limit.                 |
-|                 | `budgetsummary`  | View total trip budget and remaining funds.         |
-|                 | `listexpense`    | Compare budget vs. actual spending chronologically. |
-| **Packing**     | `additem`        | Add an item to the packing list.                    |
-|                 | `listitems`      | View the packing list and progress.                 |
-|                 | `checkitem`      | Mark a specific item as packed.                     |
-|                 | `deleteitem`     | Remove an item from the packing list.               |
-| **General**     | `help`           | View this built-in help guide.                      |
-|                 | `exit`           | Save data and close the application.                |
+| Category        | Command          | Description                                                                       |
+|:----------------|:-----------------|:----------------------------------------------------------------------------------|
+| **Trip**        | `addtrip`        | Create a new trip.                                                                |
+|                 | `listtrip`       | View a list of all your planned trips.                                            |
+|                 | `opentrip`       | Open a specific trip to manage it.                                                |
+|                 | `deletetrip`     | Permanently delete a trip.                                                        |
+|                 | `exporttrip`     | Export a trip to a text file for sharing.                                         |
+|                 | `importtrip`     | Import a shared trip from a text file.                                            |
+| **Activity**    | `addactivity`    | Add an event to the open trip.                                                    |
+|                 | `listactivity`   | View the itinerary for the open trip.                                             |
+|                 | `editactivity`   | Modify details of an existing activity.                                           |
+|                 | `deleteactivity` | Remove an activity from the itinerary.                                            |
+|                 | `nextactivity`   | Display the next closet activity that would happen.                               |
+|                 | `addremark`      | Users may add additional notes to an activity.                                    |
+| **Budget**      | `setbudget`      | Allocate funds for an activity.                                                   |
+|                 | `setexpense`     | Log actual spending for an activity.                                              |
+|                 | `setcurrency`    | Set the foreign exchange rate.                                                    |
+|                 | `setdailylimit`  | Set a maximum daily spending limit.                                               |
+|                 | `budgetsummary`  | View total trip budget and remaining funds.                                       |
+|                 | `listexpense`    | Compare budget vs. actual spending chronologically.                               |
+|                 | `budgetchart`    | Displays a visual chart showing how much of each activity's budget has been used. |
+| **Packing**     | `additem`        | Add an item to the packing list.                                                  |
+|                 | `listitems`      | View the packing list and progress.                                               |
+|                 | `checkitem`      | Mark a specific item as packed.                                                   |
+|                 | `deleteitem`     | Remove an item from the packing list.                                             |
+| **General**     | `help`           | View this built-in help guide.                                                    |
+|                 | `exit`           | Save data and close the application.                                              |

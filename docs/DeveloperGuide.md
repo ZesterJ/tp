@@ -266,17 +266,34 @@ TravelTrio provides a high-speed, distraction-free environment for itinerary man
 
 ## User Stories
 
-|Version| As a ...              | I want to ...                                                                 | So that I can ...                                                    |
-|--------|-----------------------|-------------------------------------------------------------------------------|----------------------------------------------------------------------|
-|v1.0| new user              | see usage instructions                                                        | refer to them when I forget how to use the application               |
-|v1.0| Organized user        | view all acitivities that I had added to the activity list at once            | see all of the activities i had planned for my trip                  |
-|v1.0| Organized user        | add activities to a trip with details (e.g., activity name, time and location) | append new activity to my list of activities in the itinerary        |
-|v1.0| Organized User        | see a summary of all my trips and their key dates                              | quickly review my upcoming trips                                     |
-|v2.0| Thrifty User          | record my actual spending for planned activities                              | easily track and compare my actual expenses against my planned budget |
-|v2.0| Thrifty User          | allocate budget for individual activities or travel destinations              | track and plan my expected spending                                   |
-|v2.0| Thrifty User          | see a summary of my planned spending and remaining budget                     | make informed decisions about adding new activities or expenses       |
-|v2.0| Thrifty User          | receive alerts when my planned or actual spending approaches my budget limit  | avoid overspending during my trip                                     |
-|v2.0| Thrifty User          | set a "Daily Limit"                                                           | I don't end up spending all the money in a few days                   |
+| Version | As a ...                  | I want to ...                                           | So that I can ...                                              |
+|---------|---------------------------|---------------------------------------------------------|----------------------------------------------------------------|
+| v1.0    | New user                  | see usage instructions                                  | refer to them when I forget how to use the application         |
+| v1.0    | Frequent traveler         | create a new trip with a name and date range            | keep my different trips organized separately                   |
+| v1.0    | Planner                   | open a specific trip to manage its details              | focus on planning one trip at a time                           |
+| v1.0    | Organized user            | view a list of all my planned trips                     | see an overview of all my upcoming travels                     |
+| v1.0    | Planner                   | edit an existing activity's details                     | correct mistakes or update plans as they change                |
+| v1.0    | Planner                   | delete a trip that I no longer need                     | remove outdated or cancelled trips from my list                |
+| v1.0    | Planner                   | add an activity with name, date, time, and location     | build a detailed itinerary for each day of my trip             |
+| v1.0    | Planner                   | delete an activity from my itinerary                    | remove cancelled or rescheduled events                         |
+| v1.0    | Organized user            | view my itinerary in chronological order                | see the flow of my planned activities                          |
+| v2.0    | Traveler                  | export my trip details to a text file                   | share my itinerary with friends or family                      |
+| v2.0    | Traveler                  | import a shared trip from a text file                   | use itineraries created by others as a template                |
+| v2.0    | Budget-conscious traveler | allocate a budget for each activity                     | plan my expected spending per event                            |
+| v2.0    | Budget-conscious traveler | record actual spending for each activity                | track how much I'm actually spending vs my plan                |
+| v2.0    | Loyal user                | save data and exit the application                      | preserve my trip plans for the next session                    |
+| v2.0    | International traveler    | set a foreign exchange rate                             | calculate expenses accurately in my home currency              |
+| v2.0    | Budget-conscious traveler | compare budget vs actual spending chronologically       | see where I'm overspending during my trip                      |
+| v2.0    | Budget-conscious traveler | view a summary of total trip budget and remaining funds | make informed decisions about adding new expenses              |
+| v2.1    | Time-conscious traveler   | see the next upcoming activity                          | know what I need to prepare for next                           |
+| v2.1    | Budget-conscious traveler | set a daily spending limit                              | avoid spending all my money in the first few days              |
+| v2.1    | Visual learner            | see a visual chart of budget usage                      | quickly identify which activities are using most of my budget  |
+| v2.1    | Forgetful traveler        | add items to a packing list                             | remember everything I need to bring                            |
+| v2.1    | Organized traveler        | view my packing list and packing progress               | see what I've already packed and what's left                   |
+| v2.1    | Prepared traveler         | mark items as packed                                    | track my packing progress before departure                     |
+| v2.1    | Organized traveler        | remove items from my packing list                       | delete items I decided not to bring                            |
+| v2.1    | Detail-oriented user      | add remarks or notes to an activity                     | store extra information like meeting points or contact numbers |
+
 ## Non-Functional Requirements
 
 - The software must function as a lightweight, offline-first application.
@@ -285,7 +302,17 @@ TravelTrio provides a high-speed, distraction-free environment for itinerary man
 
 ## Glossary
 
-* *glossary item* - Definition
+| Term               | Definition                                                                                                                                                             |
+|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Aggregate Root     | A cluster of associated objects treated as a single unit. `Trip` is the root for its itinerary and finances.                                                           | 
+| CLI                | Command Line Interface. A text-based user interface.                                                                                                                   | 
+| Command Pattern    | A design pattern encapsulating all information needed to perform an action into an object.                                                                             | 
+| Conflict Detection | Logic ensuring no two activities in the same trip occupy the same time slot.                                                                                           |
+| Persistence        | The characteristic of data outliving the execution of the program (achieved via `.txt` storage).                                                                       |
+| SoC                | Separation of Concerns. A design principle for separating a program into distinct sections (UI, Logic, Model, Storage) so each addresses a separate concern.           |
+| State-Aware Parser | A storage logic that tracks the current context (e.g., which trip is being read) while processing a file.                                                              |
+| Trip               | The top-level data entity in TravelTrio. It acts as the container for all activities, budgets, and packing items associated with a single travel plan.                 |
+| Activity           | A specific scheduled event within a trip itinerary, containing location, date, and time metadata. It is the primary unit for budget allocation and conflict detection. |
 
 ## Instructions for manual testing
 
@@ -377,11 +404,13 @@ Total Budget: 2000.00 | Remaining Budget: 2000.00 | Exchange Rate: 1.00
 #### Scenario 2: Activity Management
 1. Ensure a trip is open (from Scenario 1)
 2. **Add an activity:** Type `addactivity` and provide details (e.g., "Beach Day", "Sandy Beach", 2026-06-01, 09:00, 17:00)
-3. **Add another activity:** Type `addactivity` again with overlapping times (e.g., "Swimming Lesson", "Beach", 2026-06-01, 15:00, 16:00)
+3. **Add another activity:** Type `addactivity` again without overlapping times (e.g., "Swimming Lesson", "Beach", 2026-06-01, 18:00, 20:00)
    - **Expected:** Application should accept both activities without conflict warning (different activities on same day are allowed)
-4. **List activities:** Type `listactivity` — verify both activities appear in chronological order
-5. **Edit an activity:** Type `editactivity`, select an activity, and modify its location or time
-6. **Delete an activity:** Type `deleteactivity` and remove one activity — verify it's gone when you list again
+4. **Add another activity:** Type `addactivity` again with overlapping times (e.g., "Sunbathing", "Beach", 2026-06-01, 15:00, 16:00)
+   - **Expected:** Application rejects the new activity and shows a conflict warning (activity timings are not allowed to overlap)
+5. **List activities:** Type `listactivity` — verify both activities appear in chronological order
+6. **Edit an activity:** Type `editactivity`, select an activity, and modify its location or time
+7. **Delete an activity:** Type `deleteactivity` and remove one activity — verify it's gone when you list again
 
 #### Scenario 3: Budget Management (if activity has no budget set)
 1. Ensure a trip is open with at least one activity

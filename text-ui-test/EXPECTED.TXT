@@ -7,7 +7,12 @@ Welcome to
     |_|_|  \__,_| \_/ \___||_|  |_|_|  |_|\___/ 
 
 How can I help you plan today?
-Commands: addtrip, listtrip, opentrip, deletetrip, exporttrip, importtrip, addactivity, listactivity, editactivity, deleteactivity, nextactivity, addbudget, budgetsummary, budgetchart, additem, listitems, checkitem, deleteitem, setexpense, listexpense, setcurrency, setdailylimit, addremark, help, exit
+Commands: 
+addtrip, listtrip, opentrip, deletetrip, exporttrip, importtrip, 
+addactivity, listactivity, editactivity, deleteactivity, nextactivity, addremark, 
+setbudget, setexpense, setcurrency, setdailylimit, budgetsummary, listexpense, budgetchart, 
+additem, listitems, checkitem, deleteitem, 
+help, exit
 No previous data found. Starting a new journey!
 > 
 Saving your travels...

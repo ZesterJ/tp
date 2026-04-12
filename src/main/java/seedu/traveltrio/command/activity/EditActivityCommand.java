@@ -3,6 +3,9 @@ package seedu.traveltrio.command.activity;
 import seedu.traveltrio.TravelTrioException;
 import seedu.traveltrio.model.activity.Activity;
 import seedu.traveltrio.model.activity.ActivityList;
+import seedu.traveltrio.model.trip.Trip;
+
+import java.time.LocalDate;
 
 /**
  * Represents a command to edit an existing activity in the itinerary.
@@ -70,6 +73,7 @@ public class EditActivityCommand extends ActivityCommand {
             activity.setLocation(location);
         }
         if (date != null && !date.isBlank()) {
+            validateActivityDateWithinTripRange(date, activityList);
             activity.setDate(date);
         }
         if (start != null && !start.isBlank()) {
@@ -83,6 +87,31 @@ public class EditActivityCommand extends ActivityCommand {
             assert !activity.getName().isBlank() : "Activity name should not be blank after edit.";
         }
         return "Activity updated:\n\n" + activity + "\n";
+    }
+
+    /**
+     * Validates that the given activity date falls within the trip's start and end dates.
+     *
+     * @param date the activity date to validate (YYYY-MM-DD format)
+     * @param activityList the activity list containing the trip reference
+     * @throws TravelTrioException if the date is outside the trip's date range
+     */
+    private void validateActivityDateWithinTripRange(String date, ActivityList activityList) throws TravelTrioException {
+        if (date == null || date.isBlank()) {
+            return;
+        }
+        Trip trip = activityList.getTrip();
+        if (trip != null) {
+            LocalDate activityDate = LocalDate.parse(date);
+            LocalDate tripStartDate = LocalDate.parse(trip.getStartDate());
+            LocalDate tripEndDate = LocalDate.parse(trip.getEndDate());
+
+            if (activityDate.isBefore(tripStartDate) || activityDate.isAfter(tripEndDate)) {
+                throw new TravelTrioException("Invalid activity date: " + date
+                        + ". Activity date must be within the trip period ("
+                        + trip.getStartDate() + " to " + trip.getEndDate() + ").");
+            }
+        }
     }
 }
 

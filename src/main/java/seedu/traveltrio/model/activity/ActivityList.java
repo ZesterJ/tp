@@ -154,4 +154,13 @@ public class ActivityList {
         }
         return matchingActivities;
     }
+
+    /**
+     * Returns the trip associated with this activity list.
+     *
+     * @return the trip
+     */
+    public Trip getTrip() {
+        return trip;
+    }
 }

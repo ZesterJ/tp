@@ -18,21 +18,29 @@ public class HelpCommand {
                     + "7. addactivity    : Add an activity (like a flight or tour) to the open trip.\n"
                     + "8. listactivity   : View all activities scheduled for the open trip.\n"
                     + "9. editactivity   : Modify the details of an existing activity.\n"
-                    + "10. deleteactivity: Remove an activity from the itinerary.\n\n"
+                    + "10. deleteactivity: Remove an activity from the itinerary.\n"
+                    + "11. nextactivity  : Show the next upcoming activity based on current time.\n"
+                    + "12. addremark     : Add a custom remark or note to a specific activity.\n\n"
 
                     + "--- Budget Commands (Requires an open trip) ---\n"
-                    + "11. setbudget     : Assign a budget to a specific activity.\n"
-                    + "12. setexpense    : Set the actual spending for a specific activity that has a budget.\n"
-                    + "13. setcurrency   : Update the exchange rate for converting foreign currency expenses to home"
+                    + "13. setbudget     : Assign a budget to a specific activity.\n"
+                    + "14. setexpense    : Set the actual spending for a specific activity that has a budget.\n"
+                    + "15. setcurrency   : Update the exchange rate for converting foreign currency expenses to home"
                             + " currency.\n"
-                    + "14. budgetsummary : View a breakdown of expenses and remaining budget.\n"
-                    + "15. listexpense   : compare budget and actual spending for activities, "
+                    + "16. budgetsummary : View a breakdown of expenses and remaining budget.\n"
+                    + "17. listexpense   : compare budget and actual spending for activities, "
                             + "and show total spending.\n"
-                    + "16. setdailylimit : set a daily limit for expenses, warn users when limit exceeds.\n\n"
+                    + "18. setdailylimit : set a daily limit for expenses, warn users when limit exceeds.\n\n"
+
+                    + "--- Packing Commands (Requires an open trip) ---\n"
+                    + "19. additem       : Add a new item to your packing list.\n"
+                    + "20. listitems     : View all items in your packing list.\n"
+                    + "21. checkitem     : Mark an item in your packing list as packed.\n"
+                    + "22. deleteitem    : Remove an item from your packing list.\n\n"
 
                     + "--- General Commands ---\n"
-                    + "17. help          : Show this help menu.\n"
-                    + "18. exit          : Exit the application.\n"
+                    + "23. help          : Show this help menu.\n"
+                    + "24. exit          : Exit the application.\n"
                     + "---------------------------------------------------------------";
 
     public String execute() {

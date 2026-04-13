@@ -372,7 +372,7 @@ Display the next closest activity that would happen
 *Note: All monetary values displayed are of the home currency of the user.*
 
 #### 3.1 Adding a Budget for an Activity
-Records the expected or planned cost of an activity in the users home currency. To change the budget for a specific activity, the same command is used with the new budget amount. To delete a budget, simply use the same command and set the budget for the activity to 0.
+Records the expected or planned cost of an activity in the users home currency. To change the budget for a specific activity, the same command is used with the new budget amount. To delete a budget, simply use the same command and set the budget for the activity to 0. When the budget is removed, the expense for it is deleted concurrently.
 
 * Format: `setbudget`
     * After entering the command, the application will prompt the user for inputs:

@@ -39,7 +39,9 @@ public class BudgetSummaryCommand extends BudgetCommand {
         result.append("Total expense: $").append(String.format(
                 "%.2f", budgetList.getTotalTripExpense())).append("\n");
         result.append("Total remaining budget: $").append(String.format(
-                "%.2f", budgetList.getTotalRemainingTripBudget())).append("\n\n");
+                "%.2f", budgetList.getTotalRemainingTripBudget())).append("\n");
+        result.append("Exchange rate: 1 Foreign Currency = ").append(String.format(
+                "%.2f Home Currency", budgetList.getExchangeRate())).append("\n\n");
         
         if (budgetList.getBudgets().isEmpty()) {
             throw new TravelTrioException("No budgets added yet.");

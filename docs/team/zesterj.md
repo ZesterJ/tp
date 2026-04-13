@@ -150,7 +150,6 @@ Given below are my contributions to the project.
   - Updated formatting logic to display remarks consistently in listings  
 
 ---
-<div style="page-break-after: always;"></div>
 
 ### **Code Contributed**
 [RepoSense Link](https://nus-cs2113-ay2526-s2.github.io/tp-dashboard/?search=zesterj&breakdown=true&sort=groupTitle%20dsc&sortWithin=title&since=2026-02-20T00%3A00%3A00&timeframe=commit&mergegroup=&groupSelect=groupByRepos&checkedFileTypes=docs~functional-code~test-code~other&filteredFileName=&tabOpen=true&tabType=authorship&tabAuthor=ZesterJ&tabRepo=AY2526S2-CS2113-F09-4%2Ftp%5Bmaster%5D&authorshipIsMergeGroup=false&authorshipFileTypes=docs~functional-code~test-code&authorshipIsBinaryFileTypeChecked=false&authorshipIsIgnoredFilesChecked=false)
@@ -186,7 +185,6 @@ Given below are my contributions to the project.
   - Added remarks integration into the `Activity` model class  
 
 ---
-<div style="page-break-after: always;"></div>
 
 ### Community
 

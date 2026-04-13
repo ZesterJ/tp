@@ -23,12 +23,18 @@ public class AddItemCommand {
 
     /**
      * Executes the command to add a new item to the packing list.
+     * Validates the item name before adding.
      *
      * @return a success message indicating the item that was added
+     * @throws IllegalArgumentException if the item name is empty or null
      */
     public String execute() {
-        PackingItem item = new PackingItem(itemName);
+        if (itemName == null || itemName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Item name cannot be empty.");
+        }
+        String trimmedName = itemName.trim();
+        PackingItem item = new PackingItem(trimmedName);
         list.addItem(item);
-        return "Added item: " + itemName;
+        return "Added item: " + trimmedName;
     }
 }

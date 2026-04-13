@@ -28,7 +28,8 @@ public class ListItemCommand {
             return "Packing list is empty.";
         }
 
-        StringBuilder sb = new StringBuilder("Packing List:\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Packing List:\n");
 
         for (int i = 0; i < list.size(); i++) {
             sb.append(i + 1).append(". ")

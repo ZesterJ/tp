@@ -22,10 +22,15 @@ public class DeleteItemCommand {
 
     /**
      * Executes the command to delete an item from the packing list.
+     * Validates the index before removing the item.
      *
      * @return a success message indicating the item that was removed
+     * @throws IndexOutOfBoundsException if the index is invalid
      */
     public String execute() {
+        if (index < 1 || index > list.size()) {
+            throw new IndexOutOfBoundsException("Invalid item index: " + index);
+        }
         String name = list.get(index - 1).getName();
         list.remove(index - 1);
         return "Removed item: " + name;

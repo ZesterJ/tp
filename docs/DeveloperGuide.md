@@ -810,6 +810,17 @@ Packing List:
 3. Type `opentrip` without an open trip to re-prompt
 4. Navigate through various commands and verify the step-by-step guidance is clear and helpful
 
+#### Scenario 12: Delete Trip Management
+1. Ensure you have at least one trip in your list. (You can type `listtrip` to verify, or use `addtrip` to create a dummy trip first).
+2. **Delete a trip:** Type `deletetrip` and enter the index of the trip you wish to remove when prompted (e.g., `1`).
+   - **Expected:** The application displays a confirmation message showing the name and dates of the deleted trip.
+3. **Verify deletion:** Type `listtrip`.
+   - **Expected:** The deleted trip should no longer appear in the list.
+4. **Test invalid index (Out of bounds):** Type `deletetrip` and enter an index that does not exist (e.g., `0`, `-1`, or a number larger than your total trips).
+   - **Expected:** The application rejects the input, throws a `TravelTrioException`, and displays an "Invalid trip index" error message.
+5. **Verify data safety:** Type `listtrip` again.
+   - **Expected:** Your existing trips remain untouched and safe despite the invalid deletion attempt.
+
 ### Cleanup After Testing
 - Delete the `data/traveltrio.txt` file to reset to a clean state for the next test run
 - Optionally delete the entire `data/` folder if you want a completely fresh start

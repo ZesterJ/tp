@@ -61,42 +61,74 @@ This hierarchy is also observed in the other command classes (e.g., `ActivityCom
 
 ### Add Activity to Itinerary feature
 **Implementation**<br>
-The `addactivity` feature is implemented using `AddActivityCommand`. Its purpose is to add a new `Activity` into the `ActivityList` of the currently opened `Trip`.
+The `addactivity` feature is implemented across `CommandProcessor`, `AddActivityCommand`, `ActivityCommand` (base class), and `ActivityList`. Its purpose is to collect activity details from the user, validate them, and insert a new `Activity` into the `ActivityList` of the currently opened `Trip` in chronological order.
 
-The feature mainly involves the following classes:
-- AddActivityCommand — adds a new Activity into the activity list.
-- Activity — represents a single activity with fields such as name, location, date, start time, and end time.
-- ActivityList — stores all Activity objects belonging to a trip.
-- Trip — owns the corresponding ActivityList.
+The feature involves the following classes:
+- `CommandProcessor` — orchestrates user input collection and pre-validates the date and time fields before constructing the command.
+- `ActivityCommand` — abstract base class that implements `run(tripName)`, which guards execution behind a trip-open check before delegating to `execute(tripName)`.
+- `AddActivityCommand` — performs a second date-range validation, constructs the `Activity`, and calls `ActivityList#add()`.
+- `Activity` — the data object representing a scheduled event, with fields for name, location, date, start time, and end time.
+- `ActivityList` — enforces conflict detection and maintains activities in sorted order by date and start time.
+- `Trip` — the aggregate root that owns the `ActivityList`.
 
-When the user invokes `addactivity`, the system first collects the required input fields from the user. These include the activity title, location, date, start time, and end time. The input is validated before command execution. In particular:
-- the activity date must fall within the currently opened trip’s date range
-- the end time must not be earlier than the start time
+**Input collection and pre-validation in `CommandProcessor`**
 
-After validation succeeds, the system constructs an `AddActivityCommand` object with the current trip’s `ActivityList` and the activity details provided by the user.
+When the user enters `addactivity`, `CommandProcessor#handleAddActivity()` is called. It first calls `ensureTripOpen()` to confirm a trip is active, then collects the following fields one by one via `Ui`:
 
-`AddActivityCommand#execute()` is called which appends the activity to the list and a success message is returned.
+1. **Title** — prompted with `promptField("Activity Title")`.
+2. **Location** — prompted with `promptField("Location")`.
+3. **Date** — prompted in a loop using `promptDate("Date")`. If the entered date falls outside the trip’s start/end dates, an error is shown and the user is re-prompted until a valid date is entered.
+4. **Start Time** — prompted with `promptTime("Start Time")`.
+5. **End Time** — prompted with `promptTime("End Time")`. If the end time is not strictly after the start time, the user is asked whether the activity crosses midnight. If they confirm (`y`), the times are accepted as-is; otherwise a `TravelTrioException` is thrown and the command is aborted.
 
+After all fields are collected, an `AddActivityCommand` is constructed with `openTrip.getActivities()` and the five string fields. `CommandProcessor` then calls `.run(openTrip.getName())` on it.
+
+**Execution in `ActivityCommand#run()` and `AddActivityCommand#execute()`**
+
+`run(tripName)` (defined in `ActivityCommand`) first calls `activityList.isTripOpen()` to re-confirm the trip is still open, then delegates to `execute(tripName)`.
+
+`AddActivityCommand#execute(tripName)`:
+1. Calls `validateActivityDateWithinTripRange(date, activityList)` — retrieves the associated `Trip` from the `ActivityList` and checks that the activity date falls within the trip’s date range. If not, a `TravelTrioException` is thrown.
+2. Constructs a new `Activity(name, location, date, startTime, endTime)`.
+3. Calls `activityList.add(newActivity)`.
+
+**Conflict detection and sorted insertion in `ActivityList#add()`**
+
+`ActivityList#add(activity)` performs two steps:
+1. **Overlap check** — iterates all existing activities and calls `activity.overlapsWith(existing)` on each. If any overlap is found, a `TravelTrioException` is thrown with the conflicting activity’s details. No activity is added.
+2. **Sorted insertion** — if no conflict is found, the method finds the correct insertion index by comparing dates and start times (`isEarlier()`), then calls `activities.add(insertIdx, activity)`. This keeps the list in chronological order at all times.
+
+On success, `add()` returns `null`, and `execute()` returns the success message `"Activity added to [tripName]:\n\n" + activity`. `CommandProcessor` passes this to `ui.showMessageWithDivider()`.
 
 **Given below is an example usage scenario and how the add activity mechanism behaves at each step.**
 
-Step 1. The user opens a trip, for example Japan Trip. The opened Trip contains an `ActivityList`, which may initially be empty.
+Step 1. The user has already opened a trip (e.g., "Japan Trip", 2026-03-15 to 2026-03-22). The trip’s `ActivityList` may already contain some activities.
 
-Step 2. The user executes an `addactivity` command with the relevant activity details, such as activity name, location, date, and time.
+Step 2. The user types `addactivity`. `CommandProcessor` calls `ensureTripOpen()` to verify a trip is active, then prompts the user for Title and Location.
 
-Step 3. The application parses the user input and constructs a new Activity object containing the specified details.
+Step 3. `CommandProcessor` prompts for the Date in a loop. If the entered date falls outside the trip’s range, an error is shown and the user is re-prompted until a valid date is entered.
 
-Step 4. The application creates an `AddActivityCommand`, passing in the current trip’s ActivityList and the newly created Activity.
+Step 4. `CommandProcessor` prompts for Start Time and End Time. If the end time is not strictly after the start time, the user is asked whether the activity crosses midnight. If they do not confirm, a `TravelTrioException` is thrown and the command is aborted.
 
-Step 5. The user command is executed through `AddActivityCommand#execute()`. The command calls `ActivityList#add(activity)`, causing the new `activity` to be stored in the list.
+Step 5. `CommandProcessor` constructs `new AddActivityCommand(activityList, title, location, date, startTime, endTime)` and calls `.run("Japan Trip")`. `ActivityCommand#run()` re-confirms the trip is open, then calls `execute("Japan Trip")`.
 
-Step 6. A success message is returned to the user, showing that the activity has been successfully added.
+Step 6. `execute()` calls `validateActivityDateWithinTripRange()` as a defensive check, then constructs a new `Activity` and calls `activityList.add(newActivity)`.
 
-If the command input is invalid, or if no trip is currently opened, the command will not be executed successfully and no activity will be added.
+Step 7. `ActivityList#add()` checks the new activity against all existing activities for time overlaps. If a conflict is found, a `TravelTrioException` is thrown. Otherwise, the activity is inserted at the correct chronological position.
+
+Step 8. A success message is returned to `CommandProcessor` and displayed to the user via `ui.showMessageWithDivider()`.
+
+If a trip is not open, if the date is outside the trip’s range, or if the activity overlaps with an existing one, a `TravelTrioException` is thrown, the error is shown via `ui.showError()`, and no activity is added.
+
+**Design Considerations**
+
+- **Two-layer date validation**: The date range check occurs in both `CommandProcessor` (as a loop that re-prompts the user) and in `AddActivityCommand#execute()` (which throws an exception). The first layer provides a better user experience by letting the user correct their input without restarting the command. The second layer acts as a defensive guard in case the command is constructed programmatically (e.g., in tests) without going through `CommandProcessor`.
+- **Sorted insertion over post-sort**: Activities are inserted in sorted order immediately on `add()` rather than sorting the list on every display. This keeps the list consistently ordered and ensures that overlap detection always works against a predictable structure.
+- **`run()` / `execute()` separation**: The `run()` method in `ActivityCommand` centralises the trip-open guard for all activity commands. Each concrete command only implements `execute()` for its own logic, avoiding duplicated guard code across subclasses.
 
 **Sequence Diagram:**
 
-- The following sequence diagram is a simplified version that shows the success path of add activity operation, assuming that the user gives the correct inputs:
+The following sequence diagram shows the success path of the `addactivity` operation, assuming all user inputs are valid:
 ![img.png](diagrams/AddActivitySequenceDiagram.png)
 
 
@@ -338,6 +370,86 @@ If the provided exchange rate is less than or equal to zero, a `TravelTrioExcept
 
 The following sequence diagram shows how an operation to set the currency exchange rate goes:
 
+
+### Set Expense feature
+**Implementation**<br>
+The `setexpense` feature is implemented by `SetExpenseCommand`. Its purpose is to record the actual money spent for a specific activity, applying foreign currency conversion if needed, enforcing an optional daily spending limit, and warning the user when spending approaches the activity's budget cap.
+
+The feature mainly involves the following classes:
+- `CommandProcessor` — verifies that a trip is open and that both activities and budgets exist, collects the activity index, currency choice, and amount from the user, then constructs and invokes `SetExpenseCommand`.
+- `SetExpenseCommand` — extends `ExpenseCommand`. Converts the amount to home currency in the constructor if the user indicated a foreign currency, then delegates to `BudgetList` during execution.
+- `BudgetList` — applies the two core constraints (budget must exist; daily limit must not be exceeded) and updates `totalTripExpense` after the change.
+- `Budget` — validates that the amount is non-negative and within the allocated budget cap, then stores the final value.
+
+**Currency conversion**
+
+Foreign-to-home currency conversion takes place inside the `SetExpenseCommand` constructor, before `execute()` is called:
+
+```java
+if (isForeignCurrency) {
+    this.amount = amount * budgetList.getExchangeRate();
+}
+```
+
+All downstream classes therefore work exclusively with home-currency amounts and need no knowledge of the original currency.
+
+**Validation chain in `BudgetList.setExpense()`**
+
+`BudgetList.setExpense()` applies two checks in sequence before modifying any data:
+1. **Budget existence** — throws `TravelTrioException` if the target activity has no assigned budget.
+2. **Daily limit** — calls `willExceedDailyLimit(activity, newExpense)`, which computes the projected day total as `currentDayTotal - oldExpense + newExpense`. Subtracting the old expense ensures that updating an existing record is handled correctly without requiring the caller to pass the old value explicitly.
+
+Only after both checks pass does it call `budget.setActualExpense(newExpense)` and update `totalTripExpense`.
+
+**Near-budget warning**
+
+After `setExpense()` returns, `execute()` retrieves the activity's budget cap and computes the percentage consumed. If this reaches 90% or more, a warning is appended to the result message. The same threshold check exists independently in `Budget.toString()`.
+
+**Given below is an example usage scenario and how the set expense mechanism behaves at each step.**
+
+Step 1. The user opens a trip containing at least one activity with an assigned budget, then types `setexpense`. `CommandProcessor` displays the activity list and prompts for an index. The user can type `exit` to abort.
+
+Step 2. `CommandProcessor` prompts for the currency type and amount, then constructs a `SetExpenseCommand`. If foreign currency was chosen, the amount is converted to home currency immediately in the constructor.
+
+Step 3. `execute()` calls `budgetList.setExpense(activity, amount)`. `BudgetList` verifies the budget exists and the daily limit will not be breached, then calls `budget.setActualExpense(amount)` and updates `totalTripExpense`.
+
+Step 4. `execute()` retrieves the budget cap, computes the percentage spent, and returns a success message (with an optional 90% warning) to `CommandProcessor`.
+
+**Sequence Diagram:**
+
+The following sequence diagram shows the success path of the `setexpense` operation, from command construction through to the expense being stored:
+
+![img.png](diagrams/SetExpenseSequenceDiagram.png)
+
+**Design Considerations**
+
+- **Currency conversion at construction, not execution**: Keeping the conversion in the constructor makes `execute()` and all downstream classes currency-agnostic. The trade-off is that the original foreign amount is discarded after construction and cannot be recovered.
+- **Duplicate 90% threshold**: The near-budget warning is computed independently in both `SetExpenseCommand.execute()` and `Budget.toString()`. Centralising the threshold into `Budget` — for example as a `isNearLimit()` method — would make a future threshold change a single-point edit.
+- **Hard rejection when expense exceeds budget**: `Budget.setActualExpense()` throws if the amount exceeds the allocated cap. Changing this to a soft warning instead of a hard rejection would make the feature more flexible for real-world over-spending scenarios.
+
+---
+
+### List Expense feature
+**Implementation**<br>
+The `listexpense` feature is implemented by `ListExpenseCommand`. It displays all activities in a chronological table, showing the actual expense for budgeted activities and a dash for unbudgeted ones, with a total at the bottom. If a daily spending limit is set, it is shown in the header.
+
+The feature mainly involves the following classes:
+- `CommandProcessor` — verifies that a trip is open and that activities and budgets are non-empty, then constructs `ListExpenseCommand(openTrip)` and calls `execute()`.
+- `ListExpenseCommand` — extends `ExpenseCommand`. Iterates `ActivityList` directly and formats the expense data into a table string.
+- `Trip` — passed at construction to extract the trip name; `BudgetList` and `ActivityList` are delegated to the `ExpenseCommand` base class.
+- `BudgetList` — queried per activity via `getBudget(activity)` to retrieve actual expense values and the daily limit.
+
+**Display pipeline**
+
+`execute()` builds the output in three stages:
+
+1. **Header** — prints the trip name and the daily spending limit if one has been set, accessed via `tripName` and the inherited `budgetList` field.
+2. **Row formatting** — iterates `ActivityList` directly in its existing chronological order. For each activity, if a `Budget` exists its actual expense is shown; otherwise a dash (`-`) is displayed in the expense column. The date column is left blank for consecutive rows on the same date to reduce visual noise.
+3. **Footer** — prints the accumulated total of all budgeted expenses.
+
+**Design Considerations**
+
+- **Dependency on `Trip` at construction**: The constructor accepts a `Trip` object to extract the trip name, delegating `BudgetList` and `ActivityList` to the `ExpenseCommand` base class. Only `tripName` is stored as a field, keeping the coupling to `Trip` minimal.
 
 ### Storage Component
 **Implementation**<br>

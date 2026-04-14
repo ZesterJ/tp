@@ -34,7 +34,7 @@ Given below are my contributions to the project.
 **Highlights:** This feature dynamically aggregates and calculates data across all individual activities and logged expenses, providing accurate, real-time financial insights in a formatted summary.
 
 ### **New Feature: Added the ability to track cross-currency expenses (`setcurrency`)**
-**What it does:** Allows the user to update the currency exchange rate for the trip, enabling automatic cross-currency expense tracking.
+**What it does:** Allows the user to update the currency exchange rate for the trip, enabling automatic cross-currency expense tracking. User can choose to input in foreign currency when setting budget and expense.
 
 **Justification:** International travelers frequently deal with multiple currencies. Automating the conversion removes the need for manual math, reducing friction and calculation errors for the user.
 

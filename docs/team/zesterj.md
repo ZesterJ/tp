@@ -26,6 +26,29 @@ Given below are my contributions to the project.
 
 ---
 
+### **Core Classes: Trip Model and Command Structure**
+
+- **What it does:**  
+  Provides the foundational model classes and command structure for trip management functionality.
+
+- **Justification:**  
+  Establishes a clean, extensible architecture for managing trips with proper separation of concerns between model and command layers.
+
+- **Highlights:**  
+  - `Trip` class encapsulates trip details (name, dates) with associated `ActivityList`, `BudgetList`, and `PackingList`  
+  - `TripList` manages multiple trips with operations for add, remove, get, and keyword search  
+  - `TripCommand` abstract base class provides common structure for all trip-related commands  
+  - Supports file export via `toFileFormat()` and list display via `formatForList()` methods  
+
+- **Implementation:**  
+  - Created `Trip.java` model class with fields for name, start date, end date, and composition of activity/budget/packing lists  
+  - Implemented `TripList.java` with `ArrayList<Trip>` storage and methods: `add()`, `remove()`, `get()`, `findTrips()`, `contains()`  
+  - Designed `TripCommand.java` as abstract base class with `tripList` field and abstract `execute()` method  
+  - Implemented `AddTripCommand.java` with validation for non-empty name, date presence, and start-before-end logic  
+  - Implemented `ListTripCommand.java` to display all trips with formatted output including total spent when budget exists  
+
+---
+
 ### **New Feature: Schedule Conflict Detection**
 
 - **What it does:**  
@@ -155,7 +178,7 @@ Given below are my contributions to the project.
 [RepoSense Link](https://nus-cs2113-ay2526-s2.github.io/tp-dashboard/?search=zesterj&breakdown=true&sort=groupTitle%20dsc&sortWithin=title&since=2026-02-20T00%3A00%3A00&timeframe=commit&mergegroup=&groupSelect=groupByRepos&checkedFileTypes=docs~functional-code~test-code~other&filteredFileName=&tabOpen=true&tabType=authorship&tabAuthor=ZesterJ&tabRepo=AY2526S2-CS2113-F09-4%2Ftp%5Bmaster%5D&authorshipIsMergeGroup=false&authorshipFileTypes=docs~functional-code~test-code&authorshipIsBinaryFileTypeChecked=false&authorshipIsIgnoredFilesChecked=false)
 
 - Contributed across core modules including `Trip`, activity scheduling, budget management, packing list system, and parser logic.
-- Key files: `NextActivityCommand.java`, `BudgetChartCommand.java`, `AddRemarkCommand.java`, `PackingList.java`, `PackingItem.java`, `AddItemCommand.java`, `ListItemCommand.java`, `CheckItemCommand.java`, `DeleteItemCommand.java`
+- Key files: `Trip.java`, `TripList.java`, `TripCommand.java`, `AddTripCommand.java`, `ListTripCommand.java`, `NextActivityCommand.java`, `BudgetChartCommand.java`, `AddRemarkCommand.java`, `PackingList.java`, `PackingItem.java`, `AddItemCommand.java`, `ListItemCommand.java`, `CheckItemCommand.java`, `DeleteItemCommand.java`
 
 ---
 

@@ -25,7 +25,11 @@ public class SetBudgetCommand extends BudgetCommand {
      */
     public SetBudgetCommand(BudgetList budgetList, ActivityList activityList, Activity activity, double totalBudget) {
         super(budgetList, activityList , activity);
-        this.totalBudget = totalBudget;
+        if (Math.abs(totalBudget) < 0.0001) {
+            this.totalBudget = 0;
+        } else {
+            this.totalBudget = totalBudget;
+        }
     }
 
     /**
@@ -37,6 +41,7 @@ public class SetBudgetCommand extends BudgetCommand {
      */
     @Override
     public String execute() throws TravelTrioException {
+        
         if (activity == null) {
             throw new TravelTrioException("Please select an activity to add a budget for.");
         }
@@ -49,7 +54,7 @@ public class SetBudgetCommand extends BudgetCommand {
         }
         Budget newBudget = new Budget(totalBudget, activity);
         budgetList.addBudget(activity, newBudget);
-        return "Added budget for " + activity.getName() + ": $" + String.format("%.2f", totalBudget);
+        return "Added budget for " + activity.getName() + ": $" + String.format("%.4f", totalBudget);
     }
     
 }

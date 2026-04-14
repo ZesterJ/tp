@@ -150,7 +150,7 @@ Sets a trip as the active working trip, to allow users to edit the opened trip's
     ```
 <br>
 
-### 1.4 Exporting a Trip
+#### 1.4 Exporting a Trip
 Exports a specific trip and all its activity and budget details into a text file. This file can then be shared with friends or used as a backup.
 
 * Format: `exporttrip`
@@ -180,7 +180,7 @@ Exports a specific trip and all its activity and budget details into a text file
     ```
 <br>
 
-### 1.5 Importing a Trip
+#### 1.5 Importing a Trip
 Imports a trip schedule and its budget details from a provided text file into your TravelTrio application.
 
 * Format: `importtrip`
@@ -373,7 +373,7 @@ Removes an activity from the itinerary.
     ```
 <br>
 
-### 2.5 Display Next Activity
+#### 2.5 Display Next Activity
 Display the next closest activity that would happen
 * Format: `nextactivity`
 * Example Usage:
@@ -392,9 +392,6 @@ Display the next closest activity that would happen
     ===========================================================
     ```
 <br>
-
-
-
 
 ### 3. Budget Management
 *Note: budget is assigned for an activity. Thus, the activity has to be created first before setting the activity budget.*
@@ -448,7 +445,7 @@ Displays a comprehensive summary comparing your planned spending against your to
     ```
 <br>
 
-### 3.3 Viewing Budget Chart
+#### 3.3 Viewing Budget Chart
 Displays a visual chart showing how much of each activity's budget has been used.
 * Format: `budgetchart`
 
@@ -478,9 +475,14 @@ Sets the multiplier used to convert foreign currency expenses into your home cur
   ```text
   > setcurrency
   Enter the exchange rate (1 Foreign Currency = ? Home Currency): 1.50
+  ```
 
 * Expected result:
+  ```text
+  > setcurrency
   Currency exchange rate set to: 1 Foreign Currency = 1.5000 Home Currency
+  ```
+<br>
 
 #### 4.2 Set the Actual Expense for an Activity
 Records the actual amount spent on an activity. This allows users to compare the actual expense against the planned budget for each activity in budgetsummary.
@@ -535,8 +537,9 @@ Lists the actual expenses recorded for all activities in the currently opened tr
     ```
 <br>
 
-### 4.4 Set a Daily Expense Limit for a Trip
-Sets a daily spending limit for the currently opened trip. This allows users to manage their daily expenses more effectively and compare their total daily spending against the limit.
+#### 4.4 Set a Daily Expense Limit for a Trip
+Sets a daily spending limit for the currently opened trip. This allows users to manage their daily expenses more effectively and compare their total daily spending against the limit. To remove the limit, simply set it to 0.
+*Note: If the daily expense limit was set after some expenses have already been input, in the event of the daily limit being exceeded, a warning of the dates it has exceeded will be displayed*
 
 * Format: setdailylimit
   * After entering the command, the application will prompt the user for inputs:
@@ -553,12 +556,12 @@ Sets a daily spending limit for the currently opened trip. This allows users to 
     ``` 
 <br>
 
-## 5. Packing List Management
+### 5. Packing List Management
 *Note: a trip must be opened before using packing list features.*
 
 TravelTrio allows you to manage a packing checklist for each trip. You can track which items have been packed and monitor your overall packing progress using a visual progress bar.
 
-### 5.1 Adding an Item
+#### 5.1 Adding an Item
 Adds a new item to the packing list of the current trip.
 
 * Format : `additem`
@@ -575,7 +578,7 @@ Adds a new item to the packing list of the current trip.
     ```
 <br>
 
-### 5.2 Listing All Items
+#### 5.2 Listing All Items
 Displays all items in the packing list, along with their packed status and a progress tracker.
 
 * Format : `listitems`
@@ -598,7 +601,7 @@ Displays all items in the packing list, along with their packed status and a pro
     ```
 <br>
 
-### 5.3 Checking off an item as Packed
+#### 5.3 Checking off an item as Packed
 Checks off item as packed
 
 * Format : `checkitem`
@@ -615,7 +618,7 @@ Checks off item as packed
     ```
 <br>
 
-### 5.4 Deleting Item
+#### 5.4 Deleting Item
 Removes Item from the packing list
 
 * Format : `deleteitem`
@@ -705,7 +708,6 @@ Saves all current session data to the local storage file and terminates the prog
     ```
   
 <br>
-
 
 
 ## FAQ

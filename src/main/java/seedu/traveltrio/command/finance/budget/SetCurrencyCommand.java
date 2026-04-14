@@ -26,7 +26,11 @@ public class SetCurrencyCommand extends BudgetCommand{
     public SetCurrencyCommand(BudgetList budgetList, ActivityList activityList,
             Activity activity, double exchangeRate) {
         super(budgetList, activityList, activity);
-        this.exchangeRate = exchangeRate;
+        if (Math.abs(exchangeRate) < 0.0001) {
+            this.exchangeRate = 0;
+        } else {
+            this.exchangeRate = exchangeRate;
+        }
     }
 
     /**
@@ -37,6 +41,7 @@ public class SetCurrencyCommand extends BudgetCommand{
      */
     @Override
     public String execute() throws TravelTrioException {
+        
         if (exchangeRate <= 0) {
             throw new TravelTrioException("Exchange rate must be a positive number.");
         }

@@ -40,6 +40,10 @@ public class SetDailyLimitCommand {
      * @throws TravelTrioException If an error occurs while setting the limit or parsing dates.
      */
     public String execute() throws TravelTrioException {
+        if (amount == 0) {
+            budgetList.setDailySpendingLimit(0);
+            return "Daily spending limit has been removed.";
+        }
         budgetList.setDailySpendingLimit(amount);
         
         // Check all dates in the trip for exceeded limits

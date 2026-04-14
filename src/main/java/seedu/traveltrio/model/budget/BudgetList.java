@@ -167,7 +167,7 @@ public class BudgetList {
      * @return True if a daily limit is set, false otherwise.
      */
     public boolean hasDailyLimitSet(){
-        return !(dailySpendingLimit == null);
+        return !(dailySpendingLimit == null || dailySpendingLimit == 0);
     }
 
     /**

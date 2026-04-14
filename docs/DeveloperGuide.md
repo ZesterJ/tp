@@ -231,7 +231,7 @@ If the command input is invalid (such as an out-of-bounds index), a `TravelTrioE
 **Sequence Diagram:**
 
 The following sequence diagram shows how an operation to delete a trip goes:
-
+![img.png](diagrams/DeleteTripSequenceDiagram.png)
 
 ### Open Trip feature
 **Implementation**<br>
@@ -263,7 +263,7 @@ If the provided trip index is out of bounds, a `TravelTrioException` is thrown a
 **Sequence Diagram:**
 
 The following sequence diagram shows how an operation to open a trip goes:
-
+![img.png](diagrams/OpenTripSequenceDiagram.png)
 
 ### Set Budget feature
 **Implementation**<br>
@@ -338,7 +338,7 @@ If no budgets have been added to the trip yet, a `TravelTrioException` is thrown
 **Sequence Diagram:**
 
 The following sequence diagram shows how an operation to view the budget summary goes:
-
+![img.png](diagrams/BudgetSummarySequenceDiagram.png)
 
 ### Set Currency feature
 **Implementation**<br>
@@ -369,7 +369,7 @@ If the provided exchange rate is less than or equal to zero, a `TravelTrioExcept
 **Sequence Diagram:**
 
 The following sequence diagram shows how an operation to set the currency exchange rate goes:
-
+![img.png](diagrams/SetCurrencySequenceDiagram.png)
 
 ### Set Expense feature
 **Implementation**<br>
@@ -694,7 +694,7 @@ Packing List:
 #### Scenario 5: Budget Summary and Expense Tracking
 1. Ensure a trip is open with multiple activities that have budgets and expenses set
 2. **View budget summary:** Type `budgetsummary`
-   - **Expected:** Displays total budget, total spent, remaining budget, and overspending alerts (if any)
+   - **Expected:** Displays total budget, total spent, remaining budget, exchange rate, and overspending alerts (if any)
 3. **View expense list:** Type `listexpense`
    - **Expected:** Shows a chronological table of expenses grouped by date, with daily totals and daily limit warnings
 

@@ -1,0 +1,44 @@
+@startuml
+hide footbox
+participant ":BudgetSummaryCommand" as BudgetSummaryCommand
+participant "budgetList:BudgetList" as BudgetList
+participant "activityList:ActivityList" as ActivityList
+
+-> BudgetSummaryCommand : execute()
+activate BudgetSummaryCommand
+
+BudgetSummaryCommand -> BudgetList : getTotalTripBudget()
+activate BudgetList
+BudgetList --> BudgetSummaryCommand : totalBudget
+deactivate BudgetList
+
+BudgetSummaryCommand -> BudgetList : getTotalTripExpense()
+activate BudgetList
+BudgetList --> BudgetSummaryCommand : totalExpense
+deactivate BudgetList
+
+BudgetSummaryCommand -> BudgetList : getTotalRemainingTripBudget()
+activate BudgetList
+BudgetList --> BudgetSummaryCommand : remainingBudget
+deactivate BudgetList
+
+BudgetSummaryCommand -> BudgetList : getExchangeRate()
+activate BudgetList
+BudgetList --> BudgetSummaryCommand : exchangeRate
+deactivate BudgetList
+
+loop for i = 0 to activityList.size() - 1
+    BudgetSummaryCommand -> ActivityList : get(i)
+    activate ActivityList
+    ActivityList --> BudgetSummaryCommand : activity
+    deactivate ActivityList
+
+    BudgetSummaryCommand -> BudgetList : getBudget(activity)
+    activate BudgetList
+    BudgetList --> BudgetSummaryCommand : budget
+    deactivate BudgetList
+end
+
+<-- BudgetSummaryCommand : result message
+deactivate BudgetSummaryCommand
+@enduml

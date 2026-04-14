@@ -41,21 +41,26 @@ public class TravelTrio {
         CommandProcessor processor = new CommandProcessor(tripList, ui, storage);
 
         while (true) {
-            String command = ui.readCommand(processor.getOpenTripName());
-
-            if (command.equals("exit")) {
-                handleExit();
-                break;
-            }
-
             try {
+                String command = ui.readCommand(processor.getOpenTripName());
+                if (command.equals("exit")) {
+                    handleExit();
+                    break;
+                }
                 processor.process(command);
                 storage.save(tripList);
-
+            } catch (TravelTrioException e) {
+                if (e.getMessage().equals("End of input reached.")) {
+                    ui.showMessage("Input ended. Saving and exiting...");
+                    handleExit();
+                    break;
+                }
+                ui.showError(e.getMessage());
             } catch (Exception e) {
                 ui.showError("Something went wrong: " + e.getMessage());
             }
         }
+
     }
 
     /**

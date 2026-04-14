@@ -188,8 +188,15 @@ public class CommandProcessor {
         }
         printActivityList();
         int budgetActivityIdx = ui.promptInt("Enter the index of the activity to add a budget for");
+        if (budgetActivityIdx < 1 || budgetActivityIdx > openTrip.getActivities().size()) {
+            throw new TravelTrioException("Selected activity index is out of range. Please enter a number from 1 to "
+                    + openTrip.getActivities().size() + ".");
+        }
         String currencyChoice = ui.promptField("Is this amount in foreign currency? (y/n)").toLowerCase();
-        boolean isForeign = currencyChoice.equals("y") || currencyChoice.equals("yes");
+        if (!currencyChoice.equals("y") && !currencyChoice.equals("n")) {
+            throw new TravelTrioException("Invalid choice for currency. Please enter 'y' for Yes or 'n' for No.");
+        }
+        boolean isForeign = currencyChoice.equals("y");
         double budgetAmount = ui.promptDouble("Enter budget amount ($)");
         if (isForeign) {
             ui.showMessage("Amount will be converted to home currency using current exchange rate.");

@@ -209,7 +209,7 @@ Given below are my contributions to the project.
 
 ---
 
-### **Community**
+### Community
 
 - Collaborated with team members during feature integration  
 - Provided feedback on code structure and design decisions  

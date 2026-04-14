@@ -5,7 +5,8 @@ import seedu.traveltrio.model.packing.PackingList;
 /**
  * Represents a command to list all items in the packing list.
  */
-public class ListItemCommand {
+public class ListItemsCommand {
+
     private PackingList list;
 
     /**
@@ -13,7 +14,7 @@ public class ListItemCommand {
      *
      * @param list the packing list to display
      */
-    public ListItemCommand(PackingList list) {
+    public ListItemsCommand(PackingList list) {
         this.list = list;
     }
 

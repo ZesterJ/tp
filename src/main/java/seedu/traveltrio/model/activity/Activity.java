@@ -15,9 +15,9 @@ import java.time.format.DateTimeParseException;
  * Supports conflict detection for overlapping activity schedules.
  */
 public class Activity {
+
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
-
 
     private String name;
     private String location;
@@ -26,7 +26,6 @@ public class Activity {
     private LocalTime end;
     private LocalDate endDate;
     private String remark = "";
-
 
     /**
      * Constructs an Activity with the specified details.
@@ -44,7 +43,14 @@ public class Activity {
         this.date = parseDate(date);
         this.start = parseTime(start, "Start time");
         this.end = parseTime(end, "End time");
+        updateEndDate();
+    }
 
+    /**
+     * Recalculates the end date of the activity. If the end time is before or equal to
+     * the start time, it assumes the activity crosses midnight into the next day.
+     */
+    private void updateEndDate() {
         if (this.start != null && this.end != null) {
             if (!this.end.isAfter(this.start)) {
                 // end <= start means activity crosses midnight into the next day
@@ -52,6 +58,8 @@ public class Activity {
             } else {
                 this.endDate = this.date;
             }
+        } else {
+            this.endDate = this.date;
         }
     }
 
@@ -147,6 +155,7 @@ public class Activity {
      */
     public void setDate(String date) throws TravelTrioException {
         this.date = parseDate(date);
+        updateEndDate();
     }
 
     /**
@@ -166,6 +175,7 @@ public class Activity {
      */
     public void setStart(String start) throws TravelTrioException {
         this.start = parseTime(start, "Start time");
+        updateEndDate();
     }
 
     /**
@@ -185,6 +195,7 @@ public class Activity {
      */
     public void setEnd(String end) throws TravelTrioException {
         this.end = parseTime(end, "End time");
+        updateEndDate();
     }
 
     /**
@@ -260,6 +271,7 @@ public class Activity {
 
         return thisStart.isBefore(otherEnd) && otherStart.isBefore(thisEnd);
     }
+
 
     @Override
     public String toString() {

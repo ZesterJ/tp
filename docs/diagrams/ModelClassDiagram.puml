@@ -48,6 +48,7 @@ package model.activity {
         - date: LocalDate
         - start: LocalTime
         - end: LocalTime
+        - endDate: LocalDate
         - remark: String
         + Activity(name, location, date, start, end)
         + getName(): String
@@ -72,6 +73,7 @@ package model.activity {
         + isEmpty(): boolean
         + getAll(): ArrayList<Activity>
         + findActivities(String): ArrayList<Activity>
+        + getTrip(): Trip
     }
 }
 

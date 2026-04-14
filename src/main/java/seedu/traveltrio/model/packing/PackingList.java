@@ -8,6 +8,7 @@ import java.util.List;
  * Manages the collection of items that need to be packed.
  */
 public class PackingList {
+
     private final List<PackingItem> items;
 
     /**

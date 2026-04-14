@@ -19,11 +19,17 @@ import java.util.logging.Level;
  * File stores all trip, activity and budget details.
  */
 public class Storage {
+
     private static final Logger logger = Logger.getLogger(Storage.class.getName());
     private static final Ui ui = new Ui();
 
     private final String filePath;
 
+    /**
+     * Initializes a Storage object with the specified file path.
+     *
+     * @param filePath The path of the default file where application data is saved and loaded.
+     */
     public Storage(String filePath) {
         this.filePath = filePath;
     }
@@ -42,6 +48,13 @@ public class Storage {
         return parseFileToTripList(file);
     }
 
+    /**
+     * Imports a shared trip from a specified external text file.
+     *
+     * @param fileName The name or path of the file to import the trip from.
+     * @return The first Trip successfully parsed from the shared file.
+     * @throws TravelTrioException If the file is not found, or if no valid trip data can be extracted.
+     */
     public Trip importTrip(String fileName) throws TravelTrioException {
         File file = new File(fileName);
         if (!file.exists()) {
@@ -57,6 +70,14 @@ public class Storage {
         return importedTrips.get(0); // Return the first trip found in the shared file
     }
 
+    /**
+     * Exports a specific trip's data to a standalone text file for sharing or backup.
+     * Automatically appends the ".txt" extension if the user did not provide it.
+     *
+     * @param trip The Trip object to be exported.
+     * @param fileName The name or path of the target export file.
+     * @throws TravelTrioException If an I/O error occurs during the file writing process.
+     */
     public void exportTrip(Trip trip, String fileName) throws TravelTrioException {
         try {
             File file = new File(fileName);
@@ -75,6 +96,13 @@ public class Storage {
         }
     }
 
+    /**
+     * Parses the contents of a given file and reconstructs the trip data into a TripList.
+     *
+     * @param file The File object to read from.
+     * @return A TripList containing all the parsed trips, activities, budgets, and packing items.
+     * @throws TravelTrioException If the file contains invalid formatting or corrupted data.
+     */
     private TripList parseFileToTripList(File file) throws TravelTrioException {
         TripList trips = new TripList();
         try (Scanner fileScanner = new Scanner(file)) {
@@ -117,6 +145,10 @@ public class Storage {
                     ui.showError("Line wrongly formatted found. [" + line + "]. Check formatting.");
                 }
             }
+
+            for (int i = 0; i < trips.size(); i++) {
+                trips.get(i).getBudgets().recalculateTotalExpense();
+            }
         } catch (Exception e) {
             logger.log(Level.FINE, "Failed to load trips from " + file.getPath(), e);
             throw new TravelTrioException("Error reading file. File might be corrupted.");
@@ -124,6 +156,15 @@ public class Storage {
         return trips;
     }
 
+    /**
+     * Parses and loads budget details from the file scanner and attaches them to the most recently parsed activity.
+     *
+     * @param lastActivity The Activity to which this budget belongs.
+     * @param line The current string line containing the total budget.
+     * @param fileScanner The Scanner reading the file.
+     * @param currentTrip The current Trip being populated.
+     * @throws TravelTrioException If the numerical parsing fails.
+     */
     private static void loadBudgetDetails(Activity lastActivity, String line, Scanner fileScanner, Trip currentTrip)
             throws TravelTrioException {
         assert lastActivity != null : "Storage Error: " +
@@ -139,6 +180,16 @@ public class Storage {
         currentTrip.getBudgets().addBudget(lastActivity, budget);
     }
 
+    /**
+     * Parses and loads activity details from the file scanner and adds the new activity to the current trip.
+     *
+     * @param fileScanner The Scanner reading the file.
+     * @param titleLine The line containing the activity title.
+     * @param currentDate The date associated with this activity.
+     * @param currentTrip The current Trip being populated.
+     * @return The newly constructed Activity.
+     * @throws TravelTrioException If the date or time formats are invalid.
+     */
     private static Activity loadActivityDetails(Scanner fileScanner, String titleLine, String currentDate,
                                                 Trip currentTrip) throws TravelTrioException {
         String title = titleLine.split(": ")[1].trim();
@@ -151,12 +202,27 @@ public class Storage {
         return lastActivity;
     }
 
+    /**
+     * Extracts the date string from a formatted date header line in the save file.
+     *
+     * @param line The string line containing the date header.
+     * @return The extracted date string.
+     */
     private static String loadDates(String line) {
         String currentDate;
         currentDate = line.replace("===", "").replace("Date:", "").trim();
         return currentDate;
     }
 
+    /**
+     * Parses and loads the core details of a trip and adds it to the trip list.
+     * Also checks for and applies any saved exchange rates.
+     *
+     * @param fileScanner The Scanner reading the file.
+     * @param line The string line containing the basic trip details.
+     * @param trips The TripList to append the new trip to.
+     * @return The newly constructed Trip.
+     */
     private static Trip loadTripDetails(Scanner fileScanner, String line, TripList trips) {
         Trip currentTrip;
         String[] parts = line.split(" \\| ");
@@ -184,7 +250,11 @@ public class Storage {
     }
 
     /**
-     * Saves the current list of trips to the file.
+     * Saves the current list of trips and all their associated data to the default local file.
+     * Creates any necessary parent directories if they do not exist.
+     *
+     * @param trips The TripList containing the data to be saved.
+     * @throws TravelTrioException If an I/O error occurs or the directory is read-only.
      */
     public void save(TripList trips) throws TravelTrioException {
         try {
@@ -210,4 +280,5 @@ public class Storage {
             throw new TravelTrioException("Data not saved. Please check if the folder is read-only.");
         }
     }
+
 }

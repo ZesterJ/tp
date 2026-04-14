@@ -10,7 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class BudgetTest {
 
     @Test
-    void getRemainingBudget() {
+    void getRemainingBudget_budgetWithExpense_returnsCorrectRemainder() throws TravelTrioException {
+        Activity a = new Activity("Shopping", "Mall", "2026-03-11", "11:30", "15:00");
+        Budget b = new Budget(2000.00, a);
+        b.setActualExpense(500.00);
+        assertEquals(1500.00, b.getRemainingBudget());
     }
 
     @Test

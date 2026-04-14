@@ -22,7 +22,7 @@ import seedu.traveltrio.command.trip.ExportTripCommand;
 import seedu.traveltrio.command.packing.AddItemCommand;
 import seedu.traveltrio.command.packing.CheckItemCommand;
 import seedu.traveltrio.command.packing.DeleteItemCommand;
-import seedu.traveltrio.command.packing.ListItemCommand;
+import seedu.traveltrio.command.packing.ListItemsCommand;
 import seedu.traveltrio.model.activity.ActivityList;
 import seedu.traveltrio.command.others.HelpCommand;
 import seedu.traveltrio.model.trip.Trip;
@@ -38,6 +38,7 @@ import java.util.logging.Level;
  * Maintains the state of the currently opened trip.
  */
 public class CommandProcessor {
+
     private static final Logger logger = Logger.getLogger(CommandProcessor.class.getName());
 
     private final TripList tripList;
@@ -151,6 +152,9 @@ public class CommandProcessor {
         }
     }
 
+    /**
+     * Displays an error message listing all valid commands when an unknown command is entered.
+     */
     private void handleUnknownCommand() {
         ui.showError("Unknown command.\n" +
                 "Commands: \n" +
@@ -161,12 +165,22 @@ public class CommandProcessor {
                 "exit");
     }
 
+    /**
+     * Handles the generation and display of the budget summary for the open trip.
+     *
+     * @throws TravelTrioException If no trip is open.
+     */
     private void handleBudgetSummary() throws TravelTrioException {
         ensureTripOpen();
         ui.showMessageWithDivider(new BudgetSummaryCommand(openTrip.getBudgets(),
                 openTrip.getActivities()).run());
     }
 
+    /**
+     * Guides the user through setting a budget for a specific activity.
+     *
+     * @throws TravelTrioException If no trip is open or the activity list is empty.
+     */
     private void handleSetBudget() throws TravelTrioException {
         ensureTripOpen();
         if (openTrip.getActivities().isEmpty()) {
@@ -174,17 +188,33 @@ public class CommandProcessor {
         }
         printActivityList();
         int budgetActivityIdx = ui.promptInt("Enter the index of the activity to add a budget for");
+        String currencyChoice = ui.promptField("Is this amount in foreign currency? (y/n)").toLowerCase();
+        boolean isForeign = currencyChoice.equals("y") || currencyChoice.equals("yes");
         double budgetAmount = ui.promptDouble("Enter budget amount ($)");
+        if (isForeign) {
+            ui.showMessage("Amount will be converted to home currency using current exchange rate.");
+        }
         ui.showMessage(new SetBudgetCommand(openTrip.getBudgets(),
-                openTrip.getActivities(), openTrip.getActivities().get(budgetActivityIdx - 1), budgetAmount)
+                openTrip.getActivities(), openTrip.getActivities().get(budgetActivityIdx - 1), budgetAmount, isForeign)
                 .run());
     }
 
+    /**
+     * Handles the generation and display of the visual budget chart.
+     *
+     * @throws TravelTrioException If no trip is open.
+     */
     private void handleBudgetChart() throws TravelTrioException {
         ensureTripOpen();
 
         ui.showMessageWithDivider(new BudgetChartCommand(openTrip.getBudgets(), openTrip.getActivities()).execute());
     }
+
+    /**
+     * Guides the user through updating the currency exchange rate for the trip.
+     *
+     * @throws TravelTrioException If no trip is open.
+     */
     private void handleSetCurrency() throws TravelTrioException {
         ensureTripOpen();
         double exchangeRate = ui.promptDouble("Current exchange rate is 1 Foreign Currency = " 
@@ -194,9 +224,14 @@ public class CommandProcessor {
                 openTrip.getActivities(), null, exchangeRate).run());
     }
 
+    /**
+     * Guides the user through setting an actual expense for a specific activity.
+     *
+     * @throws TravelTrioException If no trip is open or no activities exist.
+     */
     private void handleSetExpense() throws TravelTrioException {
         ensureTripOpen();
-        if (openTrip.getActivities().isEmpty()) {
+        if (openTrip.getActivities().isEmpty() || openTrip.getBudgets().isEmpty()) {
             throw new TravelTrioException("Activity list is empty! No activity to set expense for now...");
         }
         printActivityList();
@@ -225,8 +260,12 @@ public class CommandProcessor {
 
         }
 
-        int currencyChoice = ui.promptInt("Is the amount in foreign currency? (1 for Yes, 0 for No)");
-        boolean isForeignCurrency = currencyChoice == 1;
+        String currencyChoice = ui.promptField("Is this amount in foreign currency? (y/n)");
+        if (!currencyChoice.equalsIgnoreCase("y") && !currencyChoice.equalsIgnoreCase("n")) {
+            throw new TravelTrioException("Invalid choice for currency. Please enter 'y' for Yes or 'n' for No.");
+        }
+        
+        boolean isForeignCurrency = currencyChoice.equalsIgnoreCase("y");
         double actualAmount = ui.promptDouble("Enter amount spent ($)");
         String successMessage = new SetExpenseCommand(
                 openTrip.getBudgets(),
@@ -239,11 +278,20 @@ public class CommandProcessor {
         ui.showMessage(successMessage);
     }
 
+    /**
+     * Returns the name of the currently opened trip.
+     *
+     * @return The open trip name, or null if no trip is currently open.
+     */
     public String getOpenTripName() {
         return openTrip == null ? null : openTrip.getName();
     }
 
-
+    /**
+     * Handles listing the chronological breakdown of all logged expenses.
+     *
+     * @throws TravelTrioException If no trip is open.
+     */
     private void handleListExpense() throws TravelTrioException {
         ensureTripOpen();
         if (openTrip.getActivities().isEmpty()) {
@@ -259,6 +307,11 @@ public class CommandProcessor {
         ui.showMessageWithDivider(resultString);
     }
 
+    /**
+     * Guides the user through deleting a specific activity from the itinerary.
+     *
+     * @throws TravelTrioException If no trip is open.
+     */
     private void handleDeleteActivity() throws TravelTrioException {
         ensureTripOpen();
         printActivityList();
@@ -267,6 +320,11 @@ public class CommandProcessor {
                 .run(openTrip.getName()));
     }
 
+    /**
+     * Guides the user through modifying the details of an existing activity.
+     *
+     * @throws TravelTrioException If no trip is open.
+     */
     private void handleEditActivity() throws TravelTrioException {
         ensureTripOpen();
         printActivityList();
@@ -282,11 +340,21 @@ public class CommandProcessor {
                 .run(openTrip.getName()));
     }
 
+    /**
+     * Handles displaying all activities for the currently open trip.
+     *
+     * @throws TravelTrioException If no trip is open.
+     */
     private void handleListActivity() throws TravelTrioException {
         ensureTripOpen();
         printActivityList();
     }
 
+    /**
+     * Helper method to format and print the activity list.
+     *
+     * @throws TravelTrioException If an error occurs during formatting.
+     */
     private void printActivityList() throws TravelTrioException {
         String tripStartDate = openTrip.getStartDate();
         String tripEndDate = openTrip.getEndDate();
@@ -342,11 +410,21 @@ public class CommandProcessor {
                 .run(openTrip.getName()));
     }
 
+    /**
+     * Handles displaying the next upcoming activity based on the current system time.
+     *
+     * @throws TravelTrioException If no trip is open.
+     */
     private void handleNextActivity() throws TravelTrioException {
         ensureTripOpen();
         ui.showMessageWithDivider(new NextActivityCommand(openTrip.getActivities()).execute(openTrip.getName()));
     }
 
+    /**
+     * Guides the user through deleting a trip from the application.
+     *
+     * @throws TravelTrioException If an error occurs during deletion.
+     */
     private void handleDeleteTrip() throws TravelTrioException {
         printTripList();
         int tripIdx = ui.promptInt("Enter the index of the trip to delete");
@@ -377,10 +455,20 @@ public class CommandProcessor {
         ui.showMessage(new OpenTripCommand(tripList, idx).execute());
     }
 
+    /**
+     * Helper method to format and print all available trips.
+     *
+     * @throws TravelTrioException If an error occurs during listing.
+     */
     private void printTripList() throws TravelTrioException {
         ui.showMessageWithDivider(new ListTripCommand(tripList).execute());
     }
 
+    /**
+     * Guides the user through creating and adding a new trip.
+     *
+     * @throws TravelTrioException If an error occurs during trip creation.
+     */
     private void handleAddTrip() throws TravelTrioException {
         logger.log(Level.FINE, "Entering handleAddTrip()");
         String name = ui.promptField("Trip Name");
@@ -405,11 +493,21 @@ public class CommandProcessor {
         ui.showMessageWithDivider(new AddTripCommand(tripList, name, start, end).execute());
     }
 
+    /**
+     * Guides the user through importing a shared trip from a text file.
+     *
+     * @throws TravelTrioException If the file cannot be read or parsed.
+     */
     private void handleImportTrip() throws TravelTrioException {
         String fileName = ui.promptField("Enter the file name to import (e.g., SharedTrip.txt)");
         ui.showMessageWithDivider(new ImportTripCommand(tripList, fileName, storage).execute());
     }
 
+    /**
+     * Guides the user through exporting a specific trip to a standalone text file.
+     *
+     * @throws TravelTrioException If no trips are available to export or file writing fails.
+     */
     private void handleExportTrip() throws TravelTrioException {
         if (tripList.isEmpty()) {
             throw new TravelTrioException("No trips available to export.");
@@ -430,18 +528,23 @@ public class CommandProcessor {
      */
     private void handleSetDailyLimit() throws TravelTrioException {
         ensureTripOpen();
-        double amount = ui.promptDouble("Enter daily spending limit to set ($)");
-        String message = new SetDailyLimitCommand(openTrip.getBudgets(), amount).execute();
+        double amount = ui.promptDouble("Enter daily spending limit to set (enter 0 to remove limit)");
+        String message = new SetDailyLimitCommand(openTrip.getBudgets(), amount, 
+                openTrip.getStartDate(), openTrip.getEndDate()).execute();
         ui.showMessage(message);
     }
 
+    /**
+     * Displays the centralized help guide.
+     */
     private void handleHelp() {
         ui.showMessage(new HelpCommand().execute());
     }
 
     /**
-     * Check to ensure a trip is open before performing trip-specific commands.
-     * @throws TravelTrioException if openTrip is null.
+     * Validates that a trip is currently open before allowing trip-specific commands to execute.
+     *
+     * @throws TravelTrioException If <code>openTrip</code> is null.
      */
     private void ensureTripOpen() throws TravelTrioException {
         if (this.openTrip == null) {
@@ -450,6 +553,11 @@ public class CommandProcessor {
         assert openTrip != null : "openTrip should not be null after check";
     }
 
+    /**
+     * Guides the user through appending a custom remark to a specific activity.
+     *
+     * @throws TravelTrioException If no trip is open or the activity list is empty.
+     */
     private void handleAddRemark() throws TravelTrioException{
         ensureTripOpen();
         if (openTrip.getActivities().isEmpty()) {
@@ -470,23 +578,43 @@ public class CommandProcessor {
         ui.showMessageWithDivider(result);
     }
 
+    /**
+     * Guides the user through adding a new item to the packing list.
+     *
+     * @throws TravelTrioException If no trip is open.
+     */
     private void handleAddItem() throws TravelTrioException {
         ensureTripOpen();
         String name = ui.promptField("Item name");
         ui.showMessage(new AddItemCommand(openTrip.getPackingList(), name).execute());
     }
 
+    /**
+     * Handles displaying all items currently in the packing list.
+     *
+     * @throws TravelTrioException If no trip is open.
+     */
     private void handleListItems() throws TravelTrioException {
         ensureTripOpen();
-        ui.showMessage(new ListItemCommand(openTrip.getPackingList()).execute());
+        ui.showMessage(new ListItemsCommand(openTrip.getPackingList()).execute());
     }
 
+    /**
+     * Guides the user through marking a specific packing item as packed.
+     *
+     * @throws TravelTrioException If no trip is open.
+     */
     private void handleCheckItem() throws TravelTrioException {
         ensureTripOpen();
         int idx = ui.promptInt("Enter item index to mark as packed");
         ui.showMessage(new CheckItemCommand(openTrip.getPackingList(), idx).execute());
     }
 
+    /**
+     * Guides the user through deleting a specific item from the packing list.
+     *
+     * @throws TravelTrioException If no trip is open.
+     */
     private void handleDeleteItem() throws TravelTrioException {
         ensureTripOpen();
         int idx = ui.promptInt("Enter item index to delete");

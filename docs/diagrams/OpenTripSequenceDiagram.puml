@@ -1,0 +1,41 @@
+@startuml
+hide footbox
+participant ":OpenTripCommand" as OpenTripCommand
+participant "tripList:TripList" as TripList
+participant "trip:Trip" as Trip
+
+-> OpenTripCommand : execute()
+activate OpenTripCommand
+
+loop for each trip in tripList
+    OpenTripCommand -> TripList : get(i)
+    activate TripList
+    TripList --> OpenTripCommand : trip
+    deactivate TripList
+
+    OpenTripCommand -> Trip : isOpen()
+    activate Trip
+    Trip --> OpenTripCommand : boolean
+    deactivate Trip
+
+    opt is open
+        OpenTripCommand -> Trip : setOpen(false)
+        activate Trip
+        Trip --> OpenTripCommand
+        deactivate Trip
+    end
+end
+
+OpenTripCommand -> TripList : get(index)
+activate TripList
+TripList --> OpenTripCommand : tripToOpen
+deactivate TripList
+
+OpenTripCommand -> Trip : setOpen(true)
+activate Trip
+Trip --> OpenTripCommand
+deactivate Trip
+
+<-- OpenTripCommand : result message
+deactivate OpenTripCommand
+@enduml

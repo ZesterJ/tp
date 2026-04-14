@@ -18,6 +18,13 @@ public class ListTripCommand extends TripCommand {
         super(tripList);
     }
 
+    /**
+     * Executes the command to list all trips. Iterates through the trip list and constructs
+     * a formatted, enumerated string of all available trips.
+     *
+     * @return Formatted string containing the enumerated list of all trips.
+     * @throws TravelTrioException If the trip list is completely empty.
+     */
     @Override
     public String execute() throws TravelTrioException {
         if (tripList.isEmpty()) {

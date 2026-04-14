@@ -1,5 +1,10 @@
 package seedu.traveltrio.command.others;
 
+/**
+ * Represents a command to display the application's help guide. A HelpCommand object retrieves
+ * a comprehensive list of all available commands, their categories, and brief descriptions
+ * to assist the user in navigating the CLI.
+ */
 public class HelpCommand {
     public static final String MESSAGE_USAGE =
             "-------------------- TRAVELTRIO HELP GUIDE --------------------\n"
@@ -44,6 +49,11 @@ public class HelpCommand {
                     + "25. exit          : Exit the application.\n"
                     + "---------------------------------------------------------------";
 
+    /**
+     * Executes the command to retrieve the help menu.
+     *
+     * @return Formatted string containing the complete user guide and command list.
+     */
     public String execute() {
         return MESSAGE_USAGE;
     }

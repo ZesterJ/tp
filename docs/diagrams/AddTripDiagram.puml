@@ -1,11 +1,11 @@
 @startuml
 actor User
-participant TravelTrio
-participant Ui
-participant CommandProcessor
-participant TripList
-participant AddTripCommand
-participant Trip
+participant ":TravelTrio" as TravelTrio
+participant ":Ui" as Ui
+participant ":CommandProcessor" as CommandProcessor
+participant ":TripList" as TripList
+participant ":AddTripCommand" as AddTripCommand
+participant ":Trip" as Trip
 
 User -> TravelTrio : run app
 User -> Ui : enter "addtrip"

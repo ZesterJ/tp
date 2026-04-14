@@ -4,6 +4,7 @@ package seedu.traveltrio.model.packing;
  * Represents an item in the packing list with a name and packed status.
  */
 public class PackingItem {
+
     private String name;
     private boolean isPacked;
 
@@ -60,6 +61,12 @@ public class PackingItem {
         return (isPacked ? "1" : "0") + "|" + name;
     }
 
+    /**
+     * Returns a string representation of the packing item for display to the user.
+     * Includes a checkbox indicator showing its packed status.
+     *
+     * @return Formatted string representing the packing item.
+     */
     @Override
     public String toString() {
         return (isPacked ? "[X] " : "[ ] ") + name;

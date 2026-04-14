@@ -7,6 +7,7 @@ import seedu.traveltrio.model.packing.PackingItem;
  * Represents a command to add a new item to the packing list.
  */
 public class AddItemCommand {
+
     private PackingList list;
     private String itemName;
 

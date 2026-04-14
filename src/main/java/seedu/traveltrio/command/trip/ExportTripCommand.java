@@ -9,6 +9,7 @@ import seedu.traveltrio.model.trip.TripList;
  * Command to export a trip to a file.
  */
 public class ExportTripCommand extends TripCommand{
+
     private final int index;
     private final String fileName;
     private final Storage storage;
@@ -28,6 +29,14 @@ public class ExportTripCommand extends TripCommand{
         this.storage = storage;
     }
 
+    /**
+     * Executes the command to export the trip to a text file. Validates that the specified
+     * trip index is within the bounds of the trip list before attempting the export.
+     *
+     * @return Formatted string confirming the successful export of the trip.
+     * @throws TravelTrioException If the provided trip index is out of bounds
+     *                             or if an error occurs during file writing.
+     */
     @Override
     public String execute() throws TravelTrioException {
         if (index < 0 || index >= tripList.size()) {

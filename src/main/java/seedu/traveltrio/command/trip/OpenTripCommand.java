@@ -9,6 +9,7 @@ import seedu.traveltrio.model.trip.TripList;
  * Ensures only one trip is open at a time by closing any previously open trip.
  */
 public class OpenTripCommand extends TripCommand {
+
     private final int index;
 
     /**
@@ -22,6 +23,13 @@ public class OpenTripCommand extends TripCommand {
         this.index = tripNumber - 1;
     }
 
+    /**
+     * Executes the command to open the selected trip. Iterates through the trip list to ensure
+     * no other trips remain open, then sets the target trip's status to active.
+     *
+     * @return Formatted string confirming the successful opening of the target trip.
+     * @throws TravelTrioException If the provided trip index is out of bounds.
+     */
     @Override
     public String execute() throws TravelTrioException {
         if (index < 0 || index >= tripList.size()) {

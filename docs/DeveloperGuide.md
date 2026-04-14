@@ -20,6 +20,7 @@ TravelTrio follows a multi-layered architecture, separating concerns into four m
 ### Model 
 - The core logic of TravelTrio is built around a hierarchical model where Trip serves as the aggregate root. This ensures that itinerary, financial, and checklist data are strictly encapsulated.
 - **Class diagram:**
+
 ![img.png](diagrams/ModelClassDiagram.png)
 
 Key Structural Components:
@@ -56,88 +57,78 @@ External Dependencies:
 
 This hierarchy is also observed in the other command classes (e.g., `ActivityCommand`, `BudgetCommand`)
 
-### Packing List Component
-**Implementation**<br>
-The packing list feature allows users to create and manage a checklist of items to pack for their trip. Each item can be marked as packed or unpacked to track packing progress.
-
-The feature mainly involves the following classes:
-- `PackingList` — Stores and manages all `PackingItem` objects for a trip.
-- `PackingItem` — Represents a single item with a name and packed status.
-- `AddItemCommand` — Adds a new item to the packing list.
-- `ListItemCommand` — Displays all items in the packing list with their status.
-- `CheckItemCommand` — Marks an item as packed.
-- `DeleteItemCommand` — Removes an item from the packing list.
-- `Trip` — Owns the `PackingList` as part of its data structure.
-
-The `PackingList` maintains an `ArrayList<PackingItem>` to store items. Each `PackingItem` has a `name` (String) and `isPacked` (boolean) field. New items are initially marked as unpacked (`isPacked = false`).
-
-The `PackingItem#toFileFormat()` method serializes items as `"1|name"` for packed items and `"0|name"` for unpacked items, allowing the storage component to persist packing data.
-
-Given below is an example usage scenario and how the packing list mechanism behaves at each step.
-
-Step 1. The user opens a trip, for example Japan Trip. The opened `Trip` contains a `PackingList`, which may initially be empty.
-
-Step 2. The user executes an `additem` command and is prompted to enter the item name.
-
-Step 3. The application collects the user input, creates a new `PackingItem` with the provided name (initially marked as unpacked), and creates an `AddItemCommand`.
-
-Step 4. The user command is executed through `AddItemCommand#execute()`. The command validates that the item name is not empty, then calls `PackingList#addItem(item)` to add the item to the list.
-
-Step 5. A success message is returned to the user, showing that the item has been added.
-
-Step 6. The user can type `listitems` to view all packing items with their packed/unpacked status displayed as `[X]` for packed and `[ ]` for unpacked.
-
-Step 7. The user can type `checkitem` and select an item index to mark it as packed. The `CheckItemCommand#execute()` calls `PackingItem#markPacked()` on the selected item.
-
-Step 8. The user can type `deleteitem` to remove an item from the list. The `DeleteItemCommand#execute()` validates the index and calls `PackingList#remove(index)`.
-
-If the command input is invalid (such as an out-of-bounds index or empty item name), or if no trip is currently opened, the command will not be executed successfully.
-
-**Sequence Diagram:**
-
-The following sequence diagram shows how an operation to add a packing item goes:
-![img.png](diagrams/AddItemSequenceDiagram.png)
-
 ## Implementation
 
 ### Add Activity to Itinerary feature
 **Implementation**<br>
-The `addactivity` feature is implemented using `AddActivityCommand`. Its purpose is to add a new `Activity` into the `ActivityList` of the currently opened `Trip`.
+The `addactivity` feature is implemented across `CommandProcessor`, `AddActivityCommand`, `ActivityCommand` (base class), and `ActivityList`. Its purpose is to collect activity details from the user, validate them, and insert a new `Activity` into the `ActivityList` of the currently opened `Trip` in chronological order.
 
-The feature mainly involves the following classes:
-- AddActivityCommand — adds a new Activity into the activity list.
-- Activity — represents a single activity with fields such as name, location, date, start time, and end time.
-- ActivityList — stores all Activity objects belonging to a trip.
-- Trip — owns the corresponding ActivityList.
+The feature involves the following classes:
+- `CommandProcessor` — orchestrates user input collection and pre-validates the date and time fields before constructing the command.
+- `ActivityCommand` — abstract base class that implements `run(tripName)`, which guards execution behind a trip-open check before delegating to `execute(tripName)`.
+- `AddActivityCommand` — performs a second date-range validation, constructs the `Activity`, and calls `ActivityList#add()`.
+- `Activity` — the data object representing a scheduled event, with fields for name, location, date, start time, and end time.
+- `ActivityList` — enforces conflict detection and maintains activities in sorted order by date and start time.
+- `Trip` — the aggregate root that owns the `ActivityList`.
 
-When the user invokes `addactivity`, the system first collects the required input fields from the user. These include the activity title, location, date, start time, and end time. The input is validated before command execution. In particular:
-- the activity date must fall within the currently opened trip’s date range
-- the end time must not be earlier than the start time
+**Input collection and pre-validation in `CommandProcessor`**
 
-After validation succeeds, the system constructs an `AddActivityCommand` object with the current trip’s `ActivityList` and the activity details provided by the user.
+When the user enters `addactivity`, `CommandProcessor#handleAddActivity()` is called. It first calls `ensureTripOpen()` to confirm a trip is active, then collects the following fields one by one via `Ui`:
 
-`AddActivityCommand#execute()` is called which appends the activity to the list and a success message is returned.
+1. **Title** — prompted with `promptField("Activity Title")`.
+2. **Location** — prompted with `promptField("Location")`.
+3. **Date** — prompted in a loop using `promptDate("Date")`. If the entered date falls outside the trip’s start/end dates, an error is shown and the user is re-prompted until a valid date is entered.
+4. **Start Time** — prompted with `promptTime("Start Time")`.
+5. **End Time** — prompted with `promptTime("End Time")`. If the end time is not strictly after the start time, the user is asked whether the activity crosses midnight. If they confirm (`y`), the times are accepted as-is; otherwise a `TravelTrioException` is thrown and the command is aborted.
 
+After all fields are collected, an `AddActivityCommand` is constructed with `openTrip.getActivities()` and the five string fields. `CommandProcessor` then calls `.run(openTrip.getName())` on it.
+
+**Execution in `ActivityCommand#run()` and `AddActivityCommand#execute()`**
+
+`run(tripName)` (defined in `ActivityCommand`) first calls `activityList.isTripOpen()` to re-confirm the trip is still open, then delegates to `execute(tripName)`.
+
+`AddActivityCommand#execute(tripName)`:
+1. Calls `validateActivityDateWithinTripRange(date, activityList)` — retrieves the associated `Trip` from the `ActivityList` and checks that the activity date falls within the trip’s date range. If not, a `TravelTrioException` is thrown.
+2. Constructs a new `Activity(name, location, date, startTime, endTime)`.
+3. Calls `activityList.add(newActivity)`.
+
+**Conflict detection and sorted insertion in `ActivityList#add()`**
+
+`ActivityList#add(activity)` performs two steps:
+1. **Overlap check** — iterates all existing activities and calls `activity.overlapsWith(existing)` on each. If any overlap is found, a `TravelTrioException` is thrown with the conflicting activity’s details. No activity is added.
+2. **Sorted insertion** — if no conflict is found, the method finds the correct insertion index by comparing dates and start times (`isEarlier()`), then calls `activities.add(insertIdx, activity)`. This keeps the list in chronological order at all times.
+
+On success, `add()` returns `null`, and `execute()` returns the success message `"Activity added to [tripName]:\n\n" + activity`. `CommandProcessor` passes this to `ui.showMessageWithDivider()`.
 
 **Given below is an example usage scenario and how the add activity mechanism behaves at each step.**
 
-Step 1. The user opens a trip, for example Japan Trip. The opened Trip contains an `ActivityList`, which may initially be empty.
+Step 1. The user has already opened a trip (e.g., "Japan Trip", 2026-03-15 to 2026-03-22). The trip’s `ActivityList` may already contain some activities.
 
-Step 2. The user executes an `addactivity` command with the relevant activity details, such as activity name, location, date, and time.
+Step 2. The user types `addactivity`. `CommandProcessor` calls `ensureTripOpen()` to verify a trip is active, then prompts the user for Title and Location.
 
-Step 3. The application parses the user input and constructs a new Activity object containing the specified details.
+Step 3. `CommandProcessor` prompts for the Date in a loop. If the entered date falls outside the trip’s range, an error is shown and the user is re-prompted until a valid date is entered.
 
-Step 4. The application creates an `AddActivityCommand`, passing in the current trip’s ActivityList and the newly created Activity.
+Step 4. `CommandProcessor` prompts for Start Time and End Time. If the end time is not strictly after the start time, the user is asked whether the activity crosses midnight. If they do not confirm, a `TravelTrioException` is thrown and the command is aborted.
 
-Step 5. The user command is executed through `AddActivityCommand#execute()`. The command calls `ActivityList#add(activity)`, causing the new `activity` to be stored in the list.
+Step 5. `CommandProcessor` constructs `new AddActivityCommand(activityList, title, location, date, startTime, endTime)` and calls `.run("Japan Trip")`. `ActivityCommand#run()` re-confirms the trip is open, then calls `execute("Japan Trip")`.
 
-Step 6. A success message is returned to the user, showing that the activity has been successfully added.
+Step 6. `execute()` calls `validateActivityDateWithinTripRange()` as a defensive check, then constructs a new `Activity` and calls `activityList.add(newActivity)`.
 
-If the command input is invalid, or if no trip is currently opened, the command will not be executed successfully and no activity will be added.
+Step 7. `ActivityList#add()` checks the new activity against all existing activities for time overlaps. If a conflict is found, a `TravelTrioException` is thrown. Otherwise, the activity is inserted at the correct chronological position.
+
+Step 8. A success message is returned to `CommandProcessor` and displayed to the user via `ui.showMessageWithDivider()`.
+
+If a trip is not open, if the date is outside the trip’s range, or if the activity overlaps with an existing one, a `TravelTrioException` is thrown, the error is shown via `ui.showError()`, and no activity is added.
+
+**Design Considerations**
+
+- **Two-layer date validation**: The date range check occurs in both `CommandProcessor` (as a loop that re-prompts the user) and in `AddActivityCommand#execute()` (which throws an exception). The first layer provides a better user experience by letting the user correct their input without restarting the command. The second layer acts as a defensive guard in case the command is constructed programmatically (e.g., in tests) without going through `CommandProcessor`.
+- **Sorted insertion over post-sort**: Activities are inserted in sorted order immediately on `add()` rather than sorting the list on every display. This keeps the list consistently ordered and ensures that overlap detection always works against a predictable structure.
+- **`run()` / `execute()` separation**: The `run()` method in `ActivityCommand` centralises the trip-open guard for all activity commands. Each concrete command only implements `execute()` for its own logic, avoiding duplicated guard code across subclasses.
 
 **Sequence Diagram:**
 
-- The following sequence diagram is a simplified version that shows the success path of add activity operation, assuming that the user gives the correct inputs:
+The following sequence diagram shows the success path of the `addactivity` operation, assuming all user inputs are valid:
 ![img.png](diagrams/AddActivitySequenceDiagram.png)
 
 
@@ -211,6 +202,69 @@ If the command input is invalid, the command will not be executed successfully a
 The following sequence diagram shows how an operation to add a trip goes:
 ![img.png](diagrams/AddTripSequenceDiagram.png)
 
+### Delete Trip feature 
+**Implementation**<br>
+The `deletetrip` feature is facilitated by `DeleteTripCommand`. It allows the user to delete a trip from the trip list by its index.
+
+The feature mainly involves the following classes:
+- `DeleteTripCommand` — removes the specified trip from the trip list.
+- `TripList` — stores all `Trip` objects and is used to retrieve and remove the target trip.
+
+The `DeleteTripCommand` receives the target `TripList` and the 1-based index of the trip to delete. When `DeleteTripCommand#execute()` is called, it validates that the index is within the bounds of the current trip list before attempting removal. It removes the trip and returns a confirmation message.
+
+Given below is an example usage scenario and how the delete trip mechanism behaves at each step.
+
+Step 1. The user executes a `deletetrip` command and provides the 1-based index of the trip they wish to delete.
+
+Step 2. The application collects the user input, capturing the index.
+
+Step 3. The application creates a `DeleteTripCommand`, passing in the current `TripList` and the target index.
+
+Step 4. The user command is executed through `DeleteTripCommand#execute()`. The command validates that the index is valid (greater than or equal to 0, and less than the trip list size). 
+
+Step 5. The command captures the string representation of the trip to be removed and calls `tripList.remove(index)`.
+
+Step 6. A formatted string confirming the successful deletion of the trip is returned to the user.
+
+If the command input is invalid (such as an out-of-bounds index), a `TravelTrioException` is thrown and the command will not be executed successfully.
+
+**Sequence Diagram:**
+
+The following sequence diagram shows how an operation to delete a trip goes:
+![img.png](diagrams/DeleteTripSequenceDiagram.png)
+
+### Open Trip feature
+**Implementation**<br>
+The `opentrip` feature is facilitated by `OpenTripCommand`. It allows the user to open a specific trip for editing. Crucially, it ensures only one trip is open at a time by closing any previously open trip.
+
+The feature mainly involves the following classes:
+- `OpenTripCommand` — opens the target trip and closes all others.
+- `TripList` — stores all `Trip` objects, which are iterated over to manage open states.
+- `Trip` — represents the travel plan whose open status is being modified.
+
+The `OpenTripCommand` receives the target `TripList` and the 1-based index of the trip to open. When `OpenTripCommand#execute()` is called, it iterates through the entire list to set any open trip's status to false, then sets the target trip's status to active.
+
+Given below is an example usage scenario and how the open trip mechanism behaves at each step.
+
+Step 1. The user executes an `opentrip` command, providing the index of the trip they wish to access.
+
+Step 2. The application creates an `OpenTripCommand`, passing in the `TripList` and the target index.
+
+Step 3. The user command is executed through `OpenTripCommand#execute()`. The command validates that the index is within bounds.
+
+Step 4. The command iterates through the `TripList`, checking if any `Trip` is currently open. If one is found, it calls `trip.setOpen(false)`.
+
+Step 5. The command retrieves the target trip and calls `tripToOpen.setOpen(true)`.
+
+Step 6. A formatted string confirming the successful opening of the target trip is returned.
+
+If the provided trip index is out of bounds, a `TravelTrioException` is thrown and the currently open trip (if any) remains open.
+
+**Sequence Diagram:**
+
+The following sequence diagram shows how an operation to open a trip goes:
+![img.png](diagrams/OpenTripSequenceDiagram.png)
+
 ### Set Budget feature
 **Implementation**<br>
 
@@ -227,7 +281,7 @@ The feature mainly involves the following classes:
 - Ui — handles all interactions with the user, such as prompting for the activity index and budget amount.
 - Storage — handles all saving and loading of txt file, allowing for saving of data across sessions. 
 
-The `SetBudgetCommand` receives the target `BudgetList`, `ActivityList`, the specific `Activity`, and the budget amount.
+The `SetBudgetCommand` receives the target `BudgetList`, `ActivityList`, the specific `Activity`, the budget amount, and whether the amount is in foreign currency.
 When `SetBudgetCommand#execute()` is called, a new `Budget` is created and added to the `BudgetList` for the activity, and a success message is returned.
 
 Given below is an example usage scenario and how the set budget mechanism behaves at each step.
@@ -236,9 +290,9 @@ Step 1. The user opens a trip, for example Japan Trip. The opened Trip contains 
 
 Step 2. The user executes a `setbudget` command, followed by seeing the list of all current activities.
 
-Step 3. The application prompts the user to select an activity from the list and enter the budget amount.
+Step 3. The application prompts the user to select an activity from the list, choose the currency, and enter the budget amount.
 
-Step 4. The application creates a `SetBudgetCommand`, passing in the current trip’s `BudgetList`, `ActivityList`, the selected `Activity`, and the budget amount.
+Step 4. The application creates a `SetBudgetCommand`, passing in the current trip’s `BudgetList`, `ActivityList`, the selected `Activity`, the budget amount, and the currency flag.
 
 Step 5. The user command is executed through `SetBudgetCommand#execute()`. The command creates a new `Budget` object and calls `BudgetList#addBudget(activity, budget)` to store it.
 
@@ -250,6 +304,152 @@ If the command input is invalid, or if no trip is currently opened, the command 
 
 The following sequence diagram shows how an operation to set budget goes:
 ![img.png](diagrams/SetBudgetSequenceDiagram.png)
+
+
+### Budget Summary feature
+**Implementation**<br>
+The `budgetsummary` feature is facilitated by `BudgetSummaryCommand`. It generates a comprehensive summary of the trip's financial status, calculating overall totals and providing an itemized breakdown per activity.
+
+The feature mainly involves the following classes:
+- `BudgetSummaryCommand` — compiles the budget summary string.
+- `BudgetList` — calculates the total trip budget, total trip expense, and remaining trip budget.
+- `ActivityList` — provides the scheduled activities to match against assigned budgets.
+
+The `BudgetSummaryCommand` receives the `BudgetList` and `ActivityList`. When `BudgetSummaryCommand#execute()` is called, it builds a formatted string with overall financial totals, followed by a line-by-line breakdown of each activity that has an allocated budget.
+
+Given below is an example usage scenario and how the budget summary mechanism behaves at each step.
+
+Step 1. The user opens a trip containing an `ActivityList` and `BudgetList`.
+
+Step 2. The user executes a `budgetsummary` command.
+
+Step 3. The application creates a `BudgetSummaryCommand`, passing in the trip's `BudgetList` and `ActivityList`.
+
+Step 4. The user command is executed through `BudgetSummaryCommand#execute()`. The command fetches the total budget, total expense, and remaining budget from `BudgetList` and formats them into a summary block.
+
+Step 5. The command checks if the budget list is empty. If it contains budgets, it iterates through the `ActivityList`.
+
+Step 6. For each activity, it checks if a corresponding budget exists. If found, it appends the activity index and budget details to the itemized breakdown.
+
+Step 7. The final formatted string is displayed to the user.
+
+If no budgets have been added to the trip yet, a `TravelTrioException` is thrown to notify the user.
+
+**Sequence Diagram:**
+
+The following sequence diagram shows how an operation to view the budget summary goes:
+![img.png](diagrams/BudgetSummarySequenceDiagram.png)
+
+### Set Currency feature
+**Implementation**<br>
+The `setcurrency` feature is facilitated by `SetCurrencyCommand`. It allows the user to update the multiplier used to convert foreign currency expenses into the user's home currency for the entire trip.
+
+The feature mainly involves the following classes:
+- `SetCurrencyCommand` — updates the exchange rate.
+- `BudgetList` — holds the financial data for the trip and stores the current exchange rate.
+
+The `SetCurrencyCommand` receives the target `BudgetList`, `ActivityList`, a null/dummy activity, and the exchange rate. When `SetCurrencyCommand#execute()` is called, it applies the new conversion rate to the `BudgetList`. 
+
+Given below is an example usage scenario and how the set currency mechanism behaves at each step.
+
+Step 1. The user opens a trip containing a `BudgetList`.
+
+Step 2. The user executes a `setcurrency` command and provides the new exchange rate.
+
+Step 3. The application creates a `SetCurrencyCommand`, passing in the current trip's `BudgetList`, `ActivityList`, and the exchange rate.
+
+Step 4. The user command is executed through `SetCurrencyCommand#execute()`. The command validates that the provided exchange rate is strictly greater than zero.
+
+Step 5. The command calls `budgetList.setExchangeRate(exchangeRate)`.
+
+Step 6. A formatted string confirming the new exchange rate (e.g., "1 Foreign Currency = X.XXXX Home Currency") is returned.
+
+If the provided exchange rate is less than or equal to zero, a `TravelTrioException` is thrown.
+
+**Sequence Diagram:**
+
+The following sequence diagram shows how an operation to set the currency exchange rate goes:
+![img.png](diagrams/SetCurrencySequenceDiagram.png)
+
+### Set Expense feature
+**Implementation**<br>
+The `setexpense` feature is implemented by `SetExpenseCommand`. Its purpose is to record the actual money spent for a specific activity, applying foreign currency conversion if needed, enforcing an optional daily spending limit, and warning the user when spending approaches the activity's budget cap.
+
+The feature mainly involves the following classes:
+- `CommandProcessor` — verifies that a trip is open and that both activities and budgets exist, collects the activity index, currency choice, and amount from the user, then constructs and invokes `SetExpenseCommand`.
+- `SetExpenseCommand` — extends `ExpenseCommand`. Converts the amount to home currency in the constructor if the user indicated a foreign currency, then delegates to `BudgetList` during execution.
+- `BudgetList` — applies the two core constraints (budget must exist; daily limit must not be exceeded) and updates `totalTripExpense` after the change.
+- `Budget` — validates that the amount is non-negative and within the allocated budget cap, then stores the final value.
+
+**Currency conversion**
+
+Foreign-to-home currency conversion takes place inside the `SetExpenseCommand` constructor, before `execute()` is called:
+
+```java
+if (isForeignCurrency) {
+    this.amount = amount * budgetList.getExchangeRate();
+}
+```
+
+All downstream classes therefore work exclusively with home-currency amounts and need no knowledge of the original currency.
+
+**Validation chain in `BudgetList.setExpense()`**
+
+`BudgetList.setExpense()` applies two checks in sequence before modifying any data:
+1. **Budget existence** — throws `TravelTrioException` if the target activity has no assigned budget.
+2. **Daily limit** — calls `willExceedDailyLimit(activity, newExpense)`, which computes the projected day total as `currentDayTotal - oldExpense + newExpense`. Subtracting the old expense ensures that updating an existing record is handled correctly without requiring the caller to pass the old value explicitly.
+
+Only after both checks pass does it call `budget.setActualExpense(newExpense)` and update `totalTripExpense`.
+
+**Near-budget warning**
+
+After `setExpense()` returns, `execute()` retrieves the activity's budget cap and computes the percentage consumed. If this reaches 90% or more, a warning is appended to the result message. The same threshold check exists independently in `Budget.toString()`.
+
+**Given below is an example usage scenario and how the set expense mechanism behaves at each step.**
+
+Step 1. The user opens a trip containing at least one activity with an assigned budget, then types `setexpense`. `CommandProcessor` displays the activity list and prompts for an index. The user can type `exit` to abort.
+
+Step 2. `CommandProcessor` prompts for the currency type and amount, then constructs a `SetExpenseCommand`. If foreign currency was chosen, the amount is converted to home currency immediately in the constructor.
+
+Step 3. `execute()` calls `budgetList.setExpense(activity, amount)`. `BudgetList` verifies the budget exists and the daily limit will not be breached, then calls `budget.setActualExpense(amount)` and updates `totalTripExpense`.
+
+Step 4. `execute()` retrieves the budget cap, computes the percentage spent, and returns a success message (with an optional 90% warning) to `CommandProcessor`.
+
+**Sequence Diagram:**
+
+The following sequence diagram shows the success path of the `setexpense` operation, from command construction through to the expense being stored:
+
+![img.png](diagrams/SetExpenseSequenceDiagram.png)
+
+**Design Considerations**
+
+- **Currency conversion at construction, not execution**: Keeping the conversion in the constructor makes `execute()` and all downstream classes currency-agnostic. The trade-off is that the original foreign amount is discarded after construction and cannot be recovered.
+- **Duplicate 90% threshold**: The near-budget warning is computed independently in both `SetExpenseCommand.execute()` and `Budget.toString()`. Centralising the threshold into `Budget` — for example as a `isNearLimit()` method — would make a future threshold change a single-point edit.
+- **Hard rejection when expense exceeds budget**: `Budget.setActualExpense()` throws if the amount exceeds the allocated cap. Changing this to a soft warning instead of a hard rejection would make the feature more flexible for real-world over-spending scenarios.
+
+---
+
+### List Expense feature
+**Implementation**<br>
+The `listexpense` feature is implemented by `ListExpenseCommand`. It displays all activities in a chronological table, showing the actual expense for budgeted activities and a dash for unbudgeted ones, with a total at the bottom. If a daily spending limit is set, it is shown in the header.
+
+The feature mainly involves the following classes:
+- `CommandProcessor` — verifies that a trip is open and that activities and budgets are non-empty, then constructs `ListExpenseCommand(openTrip)` and calls `execute()`.
+- `ListExpenseCommand` — extends `ExpenseCommand`. Iterates `ActivityList` directly and formats the expense data into a table string.
+- `Trip` — passed at construction to extract the trip name; `BudgetList` and `ActivityList` are delegated to the `ExpenseCommand` base class.
+- `BudgetList` — queried per activity via `getBudget(activity)` to retrieve actual expense values and the daily limit.
+
+**Display pipeline**
+
+`execute()` builds the output in three stages:
+
+1. **Header** — prints the trip name and the daily spending limit if one has been set, accessed via `tripName` and the inherited `budgetList` field.
+2. **Row formatting** — iterates `ActivityList` directly in its existing chronological order. For each activity, if a `Budget` exists its actual expense is shown; otherwise a dash (`-`) is displayed in the expense column. The date column is left blank for consecutive rows on the same date to reduce visual noise.
+3. **Footer** — prints the accumulated total of all budgeted expenses.
+
+**Design Considerations**
+
+- **Dependency on `Trip` at construction**: The constructor accepts a `Trip` object to extract the trip name, delegating `BudgetList` and `ActivityList` to the `ExpenseCommand` base class. Only `tripName` is stored as a field, keeping the coupling to `Trip` minimal.
 
 ### Storage Component
 **Implementation**<br>
@@ -289,136 +489,6 @@ If a line is encountered that does not match any expected prefix or formatting, 
 The following sequence diagram shows how the `Storage` component interacts with the `Scanner` and `Model` classes to load data:
 ![img.png](diagrams/StorageSequenceDiagram.png)
 
-### Add Packing Item feature 
-**Implementation**<br>
-The `additem` feature is facilitated by `AddItemCommand`. It allows the user to add a new `PackingItem` into the `PackingList` of the currently opened `Trip`.
-
-The feature mainly involves the following classes:
-- `AddItemCommand` — adds a new `PackingItem` into the packing list.
-- `PackingItem` — represents a single packing item with a name and packed status.
-- `PackingList` — stores all `PackingItem` objects belonging to a trip.
-- `Trip` — owns the corresponding `PackingList`.
-
-The `AddItemCommand` receives the target `PackingList` and the item name to be added. 
-When `AddItemCommand#execute()` is called, the command validates that the item name is not empty, creates a new `PackingItem`, adds it to the list, and returns a success message.
-
-Given below is an example usage scenario and how the add packing item mechanism behaves at each step.
-
-Step 1. The user opens a trip, for example Japan Trip. The opened `Trip` contains a `PackingList`, which may initially be empty.
-
-Step 2. The user executes an `additem` command and is prompted to enter the item name.
-
-Step 3. The application collects the user input through the `Ui` and passes it to the `CommandProcessor`.
-
-Step 4. The application creates an `AddItemCommand`, passing in the current trip's `PackingList` and the provided item name.
-
-Step 5. The user command is executed through `AddItemCommand#execute()`. The command validates that the name is not empty or null, trims whitespace, creates a new `PackingItem` object (initially marked as unpacked), and calls `PackingList#addItem(item)`.
-
-Step 6. A success message is returned to the user, showing that the item has been successfully added.
-
-If the command input is invalid (empty or null item name), the command will not be executed successfully and no item will be added.
-
-**Sequence Diagram:**
-
-The following sequence diagram shows how an operation to add a packing item goes:
-![img.png](diagrams/AddItemSequenceDiagram.png)
-
-### List Packing Items feature 
-**Implementation**<br>
-The `listitems` feature is facilitated by `ListItemCommand`. It allows the user to view all `PackingItem` objects in the `PackingList` of the currently opened `Trip`, along with their packed/unpacked status.
-
-The feature mainly involves the following classes:
-- `ListItemCommand` — retrieves and formats all items from the packing list for display.
-- `PackingList` — stores all `PackingItem` objects and provides access to them.
-- `PackingItem` — represents a single item whose status is displayed.
-- `Trip` — owns the corresponding `PackingList`.
-
-The `ListItemCommand` receives the target `PackingList`. When `ListItemCommand#execute()` is called, it checks if the list is empty. If not, it iterates through all items and formats them with their status (`[X]` for packed, `[ ]` for unpacked) and index numbers.
-
-Given below is an example usage scenario and how the list packing items mechanism behaves at each step.
-
-Step 1. The user opens a trip, for example Japan Trip. The opened `Trip` contains a `PackingList` with existing items.
-
-Step 2. The user executes a `listitems` command.
-
-Step 3. The application creates a `ListItemCommand`, passing in the current trip's `PackingList`.
-
-Step 4. The user command is executed through `ListItemCommand#execute()`. The command checks if the list is empty. If empty, it returns a message indicating the packing list is empty.
-
-Step 5. If the list contains items, the command builds a formatted string displaying each item with its index and status (e.g., "1. [X] Passport", "2. [ ] Winter Jacket").
-
-Step 6. The formatted list is displayed to the user.
-
-**Sequence Diagram:**
-
-The following sequence diagram shows how an operation to list packing items goes:
-![img.png](diagrams/ListItemSequenceDiagram.png)
-
-### Check Packing Item feature 
-**Implementation**<br>
-The `checkitem` feature is facilitated by `CheckItemCommand`. It allows the user to mark an existing `PackingItem` as packed in the `PackingList` of the currently opened `Trip`.
-
-The feature mainly involves the following classes:
-- `CheckItemCommand` — marks a specified `PackingItem` as packed.
-- `PackingItem` — represents a single packing item whose status is being updated.
-- `PackingList` — stores all `PackingItem` objects and is used to retrieve the target item.
-- `Trip` — owns the corresponding `PackingList`.
-
-The `CheckItemCommand` receives the target `PackingList` and the 1-based index of the item to mark as packed. When `CheckItemCommand#execute()` is called, it validates the index, retrieves the target `PackingItem`, calls `markPacked()` on it, and returns a success message.
-
-Given below is an example usage scenario and how the check packing item mechanism behaves at each step.
-
-Step 1. The user opens a trip, for example Japan Trip. The opened `Trip` contains a `PackingList` with existing items.
-
-Step 2. The user executes a `checkitem` command and is prompted to enter the index of the item to mark as packed.
-
-Step 3. The application collects the user input, capturing the index.
-
-Step 4. The application creates a `CheckItemCommand`, passing in the current trip's `PackingList` and the target index.
-
-Step 5. The user command is executed through `CheckItemCommand#execute()`. The command validates that the index is within bounds (1 to list size), retrieves the target `PackingItem` using `PackingList#get(index - 1)`, and calls `PackingItem#markPacked()`.
-
-Step 6. A success message is returned to the user, showing that the item has been marked as packed.
-
-If the command input is invalid (such as an out-of-bounds index), or if no trip is currently opened, the command will not be executed successfully and the item will remain unchanged.
-
-**Sequence Diagram:**
-
-The following sequence diagram shows how an operation to check a packing item goes:
-![img.png](diagrams/CheckItemSequenceDiagram.png)
-
-### Delete Packing Item feature 
-**Implementation**<br>
-The `deleteitem` feature is facilitated by `DeleteItemCommand`. It allows the user to remove an existing `PackingItem` from the `PackingList` of the currently opened `Trip`.
-
-The feature mainly involves the following classes:
-- `DeleteItemCommand` — removes a specified `PackingItem` from the packing list.
-- `PackingItem` — represents a single packing item that is being removed.
-- `PackingList` — stores all `PackingItem` objects and is used to retrieve and remove the target item.
-- `Trip` — owns the corresponding `PackingList`.
-
-The `DeleteItemCommand` receives the target `PackingList` and the 1-based index of the item to delete. When `DeleteItemCommand#execute()` is called, it validates the index, retrieves the target item's name for the success message, removes it from the list, and returns a confirmation message.
-
-Given below is an example usage scenario and how the delete packing item mechanism behaves at each step.
-
-Step 1. The user opens a trip, for example Japan Trip. The opened `Trip` contains a `PackingList` with existing items.
-
-Step 2. The user executes a `deleteitem` command and is prompted to enter the index of the item to delete.
-
-Step 3. The application collects the user input, capturing the index.
-
-Step 4. The application creates a `DeleteItemCommand`, passing in the current trip's `PackingList` and the target index.
-
-Step 5. The user command is executed through `DeleteItemCommand#execute()`. The command validates that the index is within bounds (1 to list size), retrieves the target `PackingItem` using `PackingList#get(index - 1)`, captures its name, and calls `PackingList#remove(index - 1)`.
-
-Step 6. A success message is returned to the user, showing that the item has been removed.
-
-If the command input is invalid (such as an out-of-bounds index), or if no trip is currently opened, the command will not be executed successfully and no item will be removed.
-
-**Sequence Diagram:**
-
-The following sequence diagram shows how an operation to delete a packing item goes:
-![img.png](diagrams/DeleteItemSequenceDiagram.png)
 
 ## Product scope
 ### Target user profile
@@ -519,7 +589,8 @@ TravelTrio provides a high-speed, distraction-free environment for itinerary man
 #### Pre-loading Sample Data (Alternative)
 1. Stop the application (press `Ctrl+C` or type `exit`)
 2. Create or replace `data/traveltrio.txt` with the following sample content:
-```
+
+```text
 ***************************************************************************
 Trip: Japan Trip | From: 2026-03-15 | To: 2026-03-22 | 
 Total Budget: 3000.00 | Remaining Budget: 1250.00 | Exchange Rate: 1.50
@@ -604,7 +675,7 @@ Packing List:
 
 #### Scenario 3: Budget Management (if activity has no budget set)
 1. Ensure a trip is open with at least one activity
-2. **Set budget:** Type `setbudget`, select an activity, and enter a budget amount (e.g., 150.00)
+2. **Set budget:** Type `setbudget`, select an activity, choose if the amount is in foreign currency, and enter a budget amount (e.g., 150.00)
 3. **Set expense (below budget):** Type `setexpense`, select the same activity, and enter an amount less than the budget (e.g., 100.00)
    - **Expected:** Confirmation that expense is recorded successfully
 4. **Set expense (warning level):** Type `setexpense` again, entering an amount that brings total to 90% or more of budget (e.g., 40.00 more = 140.00 total)
@@ -623,7 +694,7 @@ Packing List:
 #### Scenario 5: Budget Summary and Expense Tracking
 1. Ensure a trip is open with multiple activities that have budgets and expenses set
 2. **View budget summary:** Type `budgetsummary`
-   - **Expected:** Displays total budget, total spent, remaining budget, and overspending alerts (if any)
+   - **Expected:** Displays total budget, total spent, remaining budget, exchange rate, and overspending alerts (if any)
 3. **View expense list:** Type `listexpense`
    - **Expected:** Shows a chronological table of expenses grouped by date, with daily totals and daily limit warnings
 
@@ -681,6 +752,17 @@ Packing List:
 2. **Expected:** All major commands are listed with descriptions
 3. Type `opentrip` without an open trip to re-prompt
 4. Navigate through various commands and verify the step-by-step guidance is clear and helpful
+
+#### Scenario 12: Delete Trip Management
+1. Ensure you have at least one trip in your list. (You can type `listtrip` to verify, or use `addtrip` to create a dummy trip first).
+2. **Delete a trip:** Type `deletetrip` and enter the index of the trip you wish to remove when prompted (e.g., `1`).
+   - **Expected:** The application displays a confirmation message showing the name and dates of the deleted trip.
+3. **Verify deletion:** Type `listtrip`.
+   - **Expected:** The deleted trip should no longer appear in the list.
+4. **Test invalid index (Out of bounds):** Type `deletetrip` and enter an index that does not exist (e.g., `0`, `-1`, or a number larger than your total trips).
+   - **Expected:** The application rejects the input, throws a `TravelTrioException`, and displays an "Invalid trip index" error message.
+5. **Verify data safety:** Type `listtrip` again.
+   - **Expected:** Your existing trips remain untouched and safe despite the invalid deletion attempt.
 
 ### Cleanup After Testing
 - Delete the `data/traveltrio.txt` file to reset to a clean state for the next test run

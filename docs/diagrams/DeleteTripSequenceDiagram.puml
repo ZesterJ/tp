@@ -1,0 +1,27 @@
+@startuml
+hide footbox
+participant ":DeleteTripCommand" as DeleteTripCommand
+participant "tripList:TripList" as TripList
+participant "tripToRemove:Trip" as Trip
+
+-> DeleteTripCommand : execute()
+activate DeleteTripCommand
+
+DeleteTripCommand -> TripList : get(index)
+activate TripList
+TripList --> DeleteTripCommand : tripToRemove
+deactivate TripList
+
+DeleteTripCommand -> Trip : toString()
+activate Trip
+Trip --> DeleteTripCommand : string representation
+deactivate Trip
+
+DeleteTripCommand -> TripList : remove(index)
+activate TripList
+TripList --> DeleteTripCommand
+deactivate TripList
+
+<-- DeleteTripCommand : result message
+deactivate DeleteTripCommand
+@enduml

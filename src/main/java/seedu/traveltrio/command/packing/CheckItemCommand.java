@@ -7,6 +7,7 @@ import seedu.traveltrio.model.packing.PackingItem;
  * Represents a command to mark a packing list item as packed.
  */
 public class CheckItemCommand {
+
     private PackingList list;
     private int index;
 

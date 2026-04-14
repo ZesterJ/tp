@@ -34,7 +34,7 @@ public class ListActivityCommand extends ActivityCommand {
      * @throws TravelTrioException if the activity list is empty
      */
     public String execute(String tripName) throws TravelTrioException {
-        if (activityList.isEmpty()){
+        if (activityList.isEmpty()) {
             throw new TravelTrioException("The itinerary is Empty.");
         }
 

@@ -6,9 +6,9 @@ Whether you are planning a weekend getaway or a month-long backpacking trip, Tra
 
 ## Quick Start
 1. Ensure that you have Java 17 or above installed.
-2. Download the latest version of `tp.jar` from our [GitHub Releases Page](https://github.com/AY2526S2-CS2113-F09-4/tp/releases). 
+2. Download the latest version of `[CS2113-T09-4][TravelTrio].jar` from our [GitHub Releases Page](https://github.com/AY2526S2-CS2113-F09-4/tp/releases). 
 3. Copy the file to the folder you want to use as the home folder for your travel plans.
-4. Open a command terminal (e.g., Command Prompt on Windows, Terminal on macOS), navigate to the folder where you placed the `.jar` file, and run the following command: `java -jar tp.jar`.
+4. Open a command terminal (e.g., Command Prompt on Windows, Terminal on macOS), navigate to the folder where you placed the `.jar` file, and run the following command: `java -jar [CS2113-T09-4][TravelTrio].jar`.
 5. You should see the TravelTrio welcome logo. Type `help` and press Enter to see the list of available commands to get started!
 6. The command prompt will display your current working context:
    * `> ` means no trip is currently open
@@ -150,7 +150,7 @@ Sets a trip as the active working trip, to allow users to edit the opened trip's
     ```
 <br>
 
-### 1.4 Exporting a Trip
+#### 1.4 Exporting a Trip
 Exports a specific trip and all its activity and budget details into a text file. This file can then be shared with friends or used as a backup.
 
 * Format: `exporttrip`
@@ -180,7 +180,7 @@ Exports a specific trip and all its activity and budget details into a text file
     ```
 <br>
 
-### 1.5 Importing a Trip
+#### 1.5 Importing a Trip
 Imports a trip schedule and its budget details from a provided text file into your TravelTrio application.
 
 * Format: `importtrip`
@@ -202,6 +202,35 @@ Imports a trip schedule and its budget details from a provided text file into yo
     ```
 <br>
 
+#### 1.6 Deleting a Trip
+Permanently removes a trip from your travel planner. 
+
+* Format: `deletetrip`
+  * After entering the command, the application will prompt users for inputs:
+    * `Enter the index of the trip to delete: `
+
+* Example usage:
+
+    ```text
+    > deletetrip
+    ===========================================================
+    Trips:
+    1. Japan Winter Trip
+       Start: 2026-12-01
+       End:   2026-12-30
+    
+    2. Summer Trip at Bali
+       Start: 2026-06-01
+       End:   2026-06-30
+    ===========================================================
+    Enter the index of the trip to delete:  2
+    ```
+
+* Expected result:
+    ```text
+    Deleted trip: Summer Trip at Bali (2026-06-01 to 2026-06-30)
+    ```
+<br>
 
 ### 2. Itinerary Management
 *Note: a trip has to be "opened" by the user, in order to perform the following commands*
@@ -344,7 +373,7 @@ Removes an activity from the itinerary.
     ```
 <br>
 
-### 2.5 Display Next Activity
+#### 2.5 Display Next Activity
 Display the next closest activity that would happen
 * Format: `nextactivity`
 * Example Usage:
@@ -364,19 +393,17 @@ Display the next closest activity that would happen
     ```
 <br>
 
-
-
-
 ### 3. Budget Management
 *Note: budget is assigned for an activity. Thus, the activity has to be created first before setting the activity budget.*
 *Note: All monetary values displayed are of the home currency of the user.*
 
 #### 3.1 Adding a Budget for an Activity
-Records the expected or planned cost of an activity. To change the budget for a specific activity, the same command is used with the new budget amount. To delete a budget, simply use the same command and set the budget for the activity to 0.
+Records the expected or planned cost of an activity. You can enter the amount in either home or foreign currency, and TravelTrio will convert it automatically if needed. To change the budget for a specific activity, the same command is used with the new budget amount. To delete a budget, simply use the same command and set the budget for the activity to 0. When the budget is removed, the expense for it is deleted concurrently.
 
 * Format: `setbudget`
     * After entering the command, the application will prompt the user for inputs:
         * `Enter the index of the activity to add a budget for:`
+        * `Is this amount in foreign currency? (y/n):`
         * `Enter budget amount ($):`
       
 * Example usage:
@@ -390,6 +417,7 @@ Records the expected or planned cost of an activity. To change the budget for a 
     2   | Night Swim                | Hotel           | 2026-12-11   | 16:00 to 17:00 | -
   
     Enter the index of the activity to add a budget for:  1
+    Is this amount in foreign currency? (y/n): n
     Enter budget amount ($):  200
     ```
 * Expected result:
@@ -419,7 +447,7 @@ Displays a comprehensive summary comparing your planned spending against your to
     ```
 <br>
 
-### 3.3 Viewing Budget Chart
+#### 3.3 Viewing Budget Chart
 Displays a visual chart showing how much of each activity's budget has been used.
 * Format: `budgetchart`
 
@@ -436,7 +464,29 @@ Displays a visual chart showing how much of each activity's budget has been used
 
 ### 4. Expense Tracking
 
-#### 4.1 Set the Actual Expense for an Activity
+#### 4.1 Setting the Currency Exchange Rate
+Sets the multiplier used to convert foreign currency expenses into your home currency for the currently opened trip. This makes it easy to track overseas spending without doing manual math!
+*Note: The exchange rate determines how much 1 unit of foreign currency is worth in your home currency.*
+*Note: After changing currency, it will only affect subsequent set expenses. This allows you to change your currency when travelling to multiple countries in 1 trip*
+
+* Format: `setcurrency`
+  * After entering the command, the application will prompt the user for inputs:
+    * `Enter the exchange rate (1 Foreign Currency = ? Home Currency):`
+
+* Example usage:
+  ```text
+  > setcurrency
+  Enter the exchange rate (1 Foreign Currency = ? Home Currency): 1.50
+  ```
+
+* Expected result:
+  ```text
+  > setcurrency
+  Currency exchange rate set to: 1 Foreign Currency = 1.5000 Home Currency
+  ```
+<br>
+
+#### 4.2 Set the Actual Expense for an Activity
 Records the actual amount spent on an activity. This allows users to compare the actual expense against the planned budget for each activity in budgetsummary.
 *Note: A budget must be added for an activity before its expense can be set.*
 *Note: The user needs to specify if home currency or foreign currency is being input. 1 for foreign currency and 0 for home currency*
@@ -444,7 +494,7 @@ Records the actual amount spent on an activity. This allows users to compare the
 * Format: `setexpense`
   * After entering the command, the application will prompt the user for inputs:
     * `Enter the activity index to set actual spending`
-    * `Is the amount in foreign currency?`
+    * `Is this amount in foreign currency? (y/n)`
     * `Enter amount spent ($):`
     
 * Example usage:
@@ -466,7 +516,7 @@ Records the actual amount spent on an activity. This allows users to compare the
     ```
 <br>
 
-#### 4.2 Listing all Activity Expenses
+#### 4.3 Listing all Activity Expenses
 Lists the actual expenses recorded for all activities in the currently opened trip. This allows users to review the spending for each activity and view the total expense incurred for the trip.
 
 * Format: `listexpense`
@@ -489,8 +539,9 @@ Lists the actual expenses recorded for all activities in the currently opened tr
     ```
 <br>
 
-### 4.3 Set a Daily Expense Limit for a Trip
-Sets a daily spending limit for the currently opened trip. This allows users to manage their daily expenses more effectively and compare their total daily spending against the limit.
+#### 4.4 Set a Daily Expense Limit for a Trip
+Sets a daily spending limit for the currently opened trip. This allows users to manage their daily expenses more effectively and compare their total daily spending against the limit. To remove the limit, simply set it to 0.
+*Note: If the daily expense limit was set after some expenses have already been input, in the event of the daily limit being exceeded, a warning of the dates it has exceeded will be displayed*
 
 * Format: setdailylimit
   * After entering the command, the application will prompt the user for inputs:
@@ -507,12 +558,12 @@ Sets a daily spending limit for the currently opened trip. This allows users to 
     ``` 
 <br>
 
-## 5. Packing List Management
+### 5. Packing List Management
 *Note: a trip must be opened before using packing list features.*
 
 TravelTrio allows you to manage a packing checklist for each trip. You can track which items have been packed and monitor your overall packing progress using a visual progress bar.
 
-### 5.1 Adding an Item
+#### 5.1 Adding an Item
 Adds a new item to the packing list of the current trip.
 
 * Format : `additem`
@@ -529,7 +580,7 @@ Adds a new item to the packing list of the current trip.
     ```
 <br>
 
-### 5.2 Listing All Items
+#### 5.2 Listing All Items
 Displays all items in the packing list, along with their packed status and a progress tracker.
 
 * Format : `listitems`
@@ -552,7 +603,7 @@ Displays all items in the packing list, along with their packed status and a pro
     ```
 <br>
 
-### 5.3 Checking off an item as Packed
+#### 5.3 Checking off an item as Packed
 Checks off item as packed
 
 * Format : `checkitem`
@@ -569,7 +620,7 @@ Checks off item as packed
     ```
 <br>
 
-### 5.4 Deleting Item
+#### 5.4 Deleting Item
 Removes Item from the packing list
 
 * Format : `deleteitem`
@@ -584,8 +635,81 @@ Removes Item from the packing list
     ```text
     Removed item: passport
     ```
+
 <br>
 
+## 6. General Commands
+
+### 6.1 View Help
+Displays a summary of all available commands and their basic usage to guide the user.
+
+* Format : `help`
+
+* Example Usage:
+    ```text
+    > help
+    ```
+
+* Expected Result:
+    ```text
+    -------------------- TRAVELTRIO HELP GUIDE --------------------
+    Here are the available commands. After entering a command,
+    the app will guide you step-by-step through the process.
+    
+    --- Trip Commands ---
+    1. addtrip        : Create a new trip.
+    2. listtrip       : View a list of all your planned trips.
+    3. opentrip       : Select a specific trip to manage it.
+    4. deletetrip     : Choose a trip to delete from your list.
+    5. exporttrip     : Export a specific trip to a text file for sharing.
+    6. importtrip     : Import a shared trip from a text file.
+    
+    --- Activity Commands (Requires an open trip) ---
+    7. addactivity    : Add an activity (like a flight or tour) to the open trip.
+    8. listactivity   : View all activities scheduled for the open trip.
+    9. editactivity   : Modify the details of an existing activity.
+    10. deleteactivity: Remove an activity from the itinerary.
+    11. nextactivity  : Show the next upcoming activity based on current time.
+    12. addremark     : Add a custom remark or note to a specific activity.
+    
+    --- Budget Commands (Requires an open trip) ---
+    13. setbudget     : Assign a budget to a specific activity.
+    14. setexpense    : Set the actual spending for a specific activity that has a budget.
+    15. setcurrency   : Update the exchange rate for converting foreign currency expenses to home currency.
+    16. budgetsummary : View a breakdown of expenses and remaining budget.
+    17. budgetchart   : View a visual chart of your budget versus actual spending.
+    18. listexpense   : compare budget and actual spending for activities, and show total spending.
+    19. setdailylimit : set a daily limit for expenses, warn users when limit exceeds.
+    
+    --- Packing Commands (Requires an open trip) ---
+    20. additem       : Add a new item to your packing list.
+    21. listitems     : View all items in your packing list.
+    22. checkitem     : Mark an item in your packing list as packed.
+    23. deleteitem    : Remove an item from your packing list.
+    
+    --- General Commands ---
+    24. help          : Show this help menu.
+    25. exit          : Exit the application.
+    ---------------------------------------------------------------
+    ```
+
+### 6.2 Exit Application
+Saves all current session data to the local storage file and terminates the program securely.
+
+* Format : `exit`
+
+* Example Usage:
+    ```text
+    > exit
+    ```
+
+* Expected Result:
+    ```text
+    Saving your travels...
+    Goodbye! Happy Travels!
+    ```
+  
+<br>
 
 
 ## FAQ

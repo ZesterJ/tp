@@ -9,6 +9,7 @@ import seedu.traveltrio.model.trip.TripList;
  * Command to import a trip from a file.
  */
 public class ImportTripCommand extends TripCommand{
+
     private final String fileName;
     private final Storage storage;
 
@@ -25,6 +26,13 @@ public class ImportTripCommand extends TripCommand{
         this.storage = storage;
     }
 
+    /**
+     * Executes the command to import the trip from the text file.
+     * Adds the successfully parsed trip into the application's active trip list.
+     *
+     * @return Formatted string confirming the successful import of the new trip.
+     * @throws TravelTrioException If the file cannot be found, read, or if the internal data format is invalid.
+     */
     @Override
     public String execute() throws TravelTrioException {
         Trip importedTrip = storage.importTrip(fileName);

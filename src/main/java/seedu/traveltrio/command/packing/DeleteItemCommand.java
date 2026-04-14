@@ -6,6 +6,7 @@ import seedu.traveltrio.model.packing.PackingList;
  * Represents a command to delete an item from the packing list.
  */
 public class DeleteItemCommand {
+
     private PackingList list;
     private int index;
 

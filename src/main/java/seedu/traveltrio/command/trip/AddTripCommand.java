@@ -30,6 +30,14 @@ public class AddTripCommand extends TripCommand {
         this.endDate = endDate;
     }
 
+    /**
+     * Executes the command to add the new trip. Validates that the trip name is not empty
+     * and that the start date is chronologically before or equal to the end date.
+     *
+     * @return Formatted string confirming the successful addition of the new trip.
+     * @throws TravelTrioException If the trip name is empty, dates are missing,
+     *                             or the start date is after the end date.
+     */
     @Override
     public String execute() throws TravelTrioException {
         if (name == null || name.isBlank()) {

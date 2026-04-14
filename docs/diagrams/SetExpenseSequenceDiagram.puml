@@ -1,0 +1,39 @@
+@startuml
+hide footbox
+participant ":CommandProcessor" as CommandProcessor
+participant ":SetExpenseCommand" as SetExpenseCommand
+participant ":BudgetList" as BudgetList
+participant ":Budget" as Budget
+
+CommandProcessor -> SetExpenseCommand : new SetExpenseCommand(budgetList, activityList, activity, amount, isForeignCurrency)
+activate SetExpenseCommand
+alt isForeignCurrency
+    SetExpenseCommand -> BudgetList : getExchangeRate()
+    activate BudgetList
+    BudgetList --> SetExpenseCommand : exchangeRate
+    deactivate BudgetList
+end
+deactivate SetExpenseCommand
+
+CommandProcessor -> SetExpenseCommand : execute()
+activate SetExpenseCommand
+
+SetExpenseCommand -> BudgetList : setExpense(activity, amount)
+activate BudgetList
+BudgetList -> BudgetList : willExceedDailyLimit(activity, amount)
+BudgetList -> Budget : setActualExpense(amount)
+activate Budget
+Budget --> BudgetList
+deactivate Budget
+BudgetList --> SetExpenseCommand
+deactivate BudgetList
+
+SetExpenseCommand -> BudgetList : getBudget(activity)
+activate BudgetList
+BudgetList --> SetExpenseCommand : budget
+deactivate BudgetList
+
+SetExpenseCommand --> CommandProcessor : result message
+deactivate SetExpenseCommand
+
+@enduml

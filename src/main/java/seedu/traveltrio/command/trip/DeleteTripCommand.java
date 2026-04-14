@@ -7,6 +7,7 @@ import seedu.traveltrio.model.trip.TripList;
  * Command to delete a trip from the trip list by index.
  */
 public class DeleteTripCommand extends TripCommand {
+
     private final int index;
 
     /**
@@ -20,6 +21,13 @@ public class DeleteTripCommand extends TripCommand {
         this.index = tripNumber - 1;
     }
 
+    /**
+     * Executes the command to delete the trip. Validates that the index is within the bounds
+     * of the current trip list before attempting removal.
+     *
+     * @return Formatted string confirming the successful deletion of the trip.
+     * @throws TravelTrioException If the provided trip index is out of bounds.
+     */
     @Override
     public String execute() throws TravelTrioException {
         if (index < 0 || index >= tripList.size()) {

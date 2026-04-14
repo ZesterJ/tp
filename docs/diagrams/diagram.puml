@@ -1,12 +1,12 @@
 @startuml
 actor User
-participant TravelTrio
-participant Ui
-participant CommandProcessor
-participant Trip
-participant AddActivityCommand
-participant ActivityList
-participant Activity
+participant ":TravelTrio" as TravelTrio
+participant ":Ui" as Ui
+participant ":CommandProcessor" as CommandProcessor
+participant ":Trip" as Trip
+participant ":AddActivityCommand" as AddActivityCommand
+participant ":ActivityList" as ActivityList
+participant ":Activity" as Activity
 
 User -> TravelTrio : run app
 User -> Ui : enter "addactivity"

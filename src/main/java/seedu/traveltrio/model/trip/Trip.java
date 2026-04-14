@@ -12,6 +12,7 @@ import seedu.traveltrio.model.packing.PackingList;
  * open at a time.
  */
 public class Trip {
+
     public static final String TRIP_DIVIDER_LINE =
             "***************************************************************************";
     public static final String ACTIVITY_DIVIDER_LINE =

@@ -32,17 +32,17 @@ Object Diagram
 - The following diagram illustrates an example of the system state when a user is managing trips. It demonstrates how instances of `Activity`, `Budget`, and `PackingItem` are linked together under a specific Trip instance.
 ![img.png](diagrams/ModelObjectDiagram.png)
 - Scenario Details:
-  - Trip Management: The user has one trip in their TripList. The "Japan Trip 2024" is currently open. 
-  - Itinerary Planning: The open trip contains three activities: "Mount Fuji Day Trip", "Tokyo Tower Visit" and "Sushi Making Class". 
-  - Financial Tracking: 
-    - A budget of $300.00 is specifically linked to the Mount Fuji Day Trip activity. 
+  - Trip Management: The user has one trip in their TripList. The "Japan Trip 2024" is currently open.
+  - Itinerary Planning: The open trip contains three activities: "Mount Fuji Day Trip", "Tokyo Tower Visit", and "Sushi Making Class".
+  - Financial Tracking:
+    - A budget of $300.00 is specifically linked to the Mount Fuji Day Trip activity.
     - A budget of $100.00 is linked to the Tokyo Tower Visit activity.
     - Actual expense is also tracked for both activities, with $280.00 for the Mount Fuji Day Trip activity and $85.00 for the Tokyo Tower Visit activity.
     - No budget is set for the Sushi Making Class activity.
-  - Packing Progress: The packing list for the current trip includes 
-    - "Camera" (already packed) 
+  - Packing Progress: The packing list for the current trip includes:
+    - "Camera" (already packed)
     - "Winter Jacket" (not yet packed)
-    - "Travel Adapter" (not yet packed) and
+    - "Travel Adapter" (not yet packed)
     - "Passport" (already packed)
 
 ### Command Hierarchy
@@ -167,12 +167,46 @@ If the command input is invalid (such as an out-of-bounds index), or if no trip 
 The following sequence diagram shows how an operation to edit an activity goes:
 ![img.png](diagrams/EditActivitySequenceDiagram.png)
 
+### Add Remark Activity feature
+**Implementation**<br>
+The `addremark` feature is facilitated by `AddRemarkCommand`. It allows the user to add custom remarks or notes to an existing `Activity` within the `ActivityList` of the currently opened `Trip`.
+
+The feature mainly involves the following classes:
+- `AddRemarkCommand` — adds a remark to the specified activity.
+- `Activity` — represents a single activity whose remark field is being updated.
+- `ActivityList` — stores all `Activity` objects belonging to a trip and is used to retrieve the target activity.
+- `Trip` — owns the corresponding `ActivityList`.
+
+The `AddRemarkCommand` receives the target `ActivityList`, the index of the activity to add a remark to, and the remark text.
+When `AddRemarkCommand#execute()` is called, the target activity is retrieved, its remark field is updated via the setter method, and a success message is returned.
+
+Given below is an example usage scenario and how the add remark mechanism behaves at each step.
+
+Step 1. The user opens a trip, for example Japan Trip. The opened `Trip` contains an `ActivityList` with existing activities.
+
+Step 2. The user executes an `addremark` command and is shown the list of activities with their current remarks (or `-` if no remark exists).
+
+Step 3. The application collects the user input, capturing the index of the activity and the remark text.
+
+Step 4. The application creates an `AddRemarkCommand`, passing in the current trip's `ActivityList`, the target index, and the remark text.
+
+Step 5. The user command is executed through `AddRemarkCommand#execute()`. The command retrieves the target `Activity` from the list using the provided index and calls its `setRemark()` method.
+
+Step 6. A success message is returned to the user, showing that the remark has been successfully added to the activity.
+
+If the command input is invalid (such as an out-of-bounds index), or if no trip is currently opened, the command will not be executed successfully and the activity will remain unchanged.
+
+**Sequence Diagram:**
+
+The following sequence diagram shows how an operation to add a remark to an activity goes:
+![img.png](diagrams/AddRemarkSequenceDiagram.png)
+
 ### Add Trip feature
 **Implementation**<br>
 The `addtrip` feature is facilitated by `AddTripCommand`. It allows the user to create a new `Trip` and add it to the `TripList`.
 
 The feature mainly involves the following classes:
-- AddTripCommand — adds a new Trip into the trip list.
+- AddTripCommand — adds a new Trip to the trip list.
 - Trip — represents a single trip with fields such as name, start date, and end date.
 - TripList — stores all Trip objects created by the user.
 
@@ -279,7 +313,7 @@ The feature mainly involves the following classes:
 - Trip — owns the corresponding ActivityList and BudgetList.
 - CommandProcessor — handles the user input, ensures a trip is open, and orchestrates the creation of the command.
 - Ui — handles all interactions with the user, such as prompting for the activity index and budget amount.
-- Storage — handles all saving and loading of txt file, allowing for saving of data across sessions. 
+- Storage — handles all saving and loading of text files, allowing for data persistence across sessions. 
 
 The `SetBudgetCommand` receives the target `BudgetList`, `ActivityList`, the specific `Activity`, the budget amount, and whether the amount is in foreign currency.
 When `SetBudgetCommand#execute()` is called, a new `Budget` is created and added to the `BudgetList` for the activity, and a success message is returned.
@@ -424,7 +458,7 @@ The following sequence diagram shows the success path of the `setexpense` operat
 **Design Considerations**
 
 - **Currency conversion at construction, not execution**: Keeping the conversion in the constructor makes `execute()` and all downstream classes currency-agnostic. The trade-off is that the original foreign amount is discarded after construction and cannot be recovered.
-- **Duplicate 90% threshold**: The near-budget warning is computed independently in both `SetExpenseCommand.execute()` and `Budget.toString()`. Centralising the threshold into `Budget` — for example as a `isNearLimit()` method — would make a future threshold change a single-point edit.
+- **Duplicate 90% threshold**: The near-budget warning is computed independently in both `SetExpenseCommand.execute()` and `Budget.toString()`. Centralizing the threshold into `Budget` — for example as an `isNearLimit()` method — would make a future threshold change a single-point edit.
 - **Hard rejection when expense exceeds budget**: `Budget.setActualExpense()` throws if the amount exceeds the allocated cap. Changing this to a soft warning instead of a hard rejection would make the feature more flexible for real-world over-spending scenarios.
 
 ---
@@ -481,8 +515,7 @@ Step 6. If a **`Budget set:`** line is found, the parser calls `loadBudgetDetail
 
 Step 7. Once the end of the file is reached, the fully populated `TripList` is returned to the `Main` controller.
 
-If the parser encounters a line it does not recognize (and is not a known summary line like `Total Budget:`), it triggers a `ui.showError` to alert the user of potential file corruption.
-If a line is encountered that does not match any expected prefix or formatting, a `TravelTrioException` is thrown, alerting the user to the specific line that requires manual correction.
+If the parser encounters a line it does not recognize (and is not a known summary line like `Total Budget:`), a `TravelTrioException` is thrown, alerting the user to the specific line that requires manual correction.
 
 **Sequence Diagram:**
 
@@ -524,7 +557,7 @@ TravelTrio provides a high-speed, distraction-free environment for itinerary man
 | v2.0    | Traveler                  | import a shared trip from a text file                   | use itineraries created by others as a template                |
 | v2.0    | Budget-conscious traveler | allocate a budget for each activity                     | plan my expected spending per event                            |
 | v2.0    | Budget-conscious traveler | record actual spending for each activity                | track how much I'm actually spending vs my plan                |
-| v2.0    | Loyal user                | save data and exit the application                      | preserve my trip plans for the next session                    |
+| v2.0    | Returning user            | save data and exit the application                      | preserve my trip plans for the next session                    |
 | v2.0    | International traveler    | set a foreign exchange rate                             | calculate expenses accurately in my home currency              |
 | v2.0    | Budget-conscious traveler | compare budget vs actual spending chronologically       | see where I'm overspending during my trip                      |
 | v2.0    | Budget-conscious traveler | view a summary of total trip budget and remaining funds | make informed decisions about adding new expenses              |
@@ -556,7 +589,7 @@ TravelTrio provides a high-speed, distraction-free environment for itinerary man
 | State-Aware Parser | A storage logic that tracks the current context (e.g., which trip is being read) while processing a file.                                                              |
 | Trip               | The top-level data entity in TravelTrio. It acts as the container for all activities, budgets, and packing items associated with a single travel plan.                 |
 | Activity           | A specific scheduled event within a trip itinerary, containing location, date, and time metadata. It is the primary unit for budget allocation and conflict detection. |
-| PackingItem        | A single item in the packing list with a name and packed status. Displayed as `[X] name` when packed and `[ ] name` when unpacked.                                     |
+| PackingItem        | A single item in the packing list with a name and packed status. Displayed as `[✓] name` when packed and `[✗] name` when unpacked.                                   |
 | PackingList        | A collection of PackingItem objects belonging to a trip. Supports add, list, check (mark as packed), and delete operations.                                            |
 
 ## Instructions for manual testing
@@ -660,13 +693,17 @@ Packing List:
 1. **Add a new trip:** Type `addtrip` and follow the prompts to create a trip (e.g., "Summer Beach Vacation", 2026-06-01, 2026-06-10)
 2. **List all trips:** Type `listtrip` — verify your new trip appears in the list
 3. **Open a trip:** Type `opentrip` and select the trip you just created
-4. **Expected output:** The application should confirm which trip is now open
+4. **Expected output:**
+   ```text
+   Opened trip: Japan Trip (2026-03-15 to 2026-03-22)
+   [Opened: Japan Trip] >
+   ```
 
 #### Scenario 2: Activity Management
 1. Ensure a trip is open (from Scenario 1)
 2. **Add an activity:** Type `addactivity` and provide details (e.g., "Beach Day", "Sandy Beach", 2026-06-01, 09:00, 17:00)
 3. **Add another activity:** Type `addactivity` again without overlapping times (e.g., "Swimming Lesson", "Beach", 2026-06-01, 18:00, 20:00)
-   - **Expected:** Application should accept both activities without conflict warning (different activities on same day are allowed)
+   - **Expected:** Application should accept both activities (multiple non-overlapping activities on the same day are allowed)
 4. **Add another activity:** Type `addactivity` again with overlapping times (e.g., "Sunbathing", "Beach", 2026-06-01, 15:00, 16:00)
    - **Expected:** Application rejects the new activity and shows a conflict warning (activity timings are not allowed to overlap)
 5. **List activities:** Type `listactivity` — verify both activities appear in chronological order
@@ -681,7 +718,7 @@ Packing List:
 4. **Set expense (warning level):** Type `setexpense` again, entering an amount that brings total to 90% or more of budget (e.g., 40.00 more = 140.00 total)
    - **Expected:** Warning message that expense is approaching budget limit
 5. **Attempt to exceed budget:** Type `setexpense` and try to enter an amount that would exceed the budget
-   - **Expected:** Application should reject the expense and prompt you to increase the budget first
+   - **Expected:** Application should reject the expense with an error message
 
 #### Scenario 4: Currency Conversion
 1. Ensure a trip is open

@@ -1,7 +1,7 @@
 # TravelTrio User Guide
 
 ## Introduction
-**TravelTrio** is a desktop travel management application optimized for users who prefer a Command Line Interface (CLI). It helps organized and thrifty travelers manage complex trip itineraries, track activity-based budgets, and handle currency exchange rates within a single and lightweight environment.
+**TravelTrio** is a desktop travel management application optimized for users who prefer a Command Line Interface (CLI). It helps organized and thrifty travelers manage complex trip itineraries, track activity-based budgets, and handle currency exchange rates within a single, lightweight environment.
 Whether you are planning a weekend getaway or a month-long backpacking trip, TravelTrio ensures your schedule is conflict-free and your wallet is happy.
 
 ## Quick Start
@@ -31,7 +31,7 @@ Unlike traditional CLI apps that force you to type long, complicated command str
 1. **Trip Management**
     Manage multiple travel plans in one place.
    * Create Trips: Use `addtrip` to define a trip name and its duration. The app automatically validates that your start date occurs before your end date. 
-   * Track Multiple Itineraries: View all your saved journeys with `listtrip` and see a high-level spending summary for each.
+   * Track Multiple Itineraries: View all your saved trips with `listtrip` and see a high-level spending summary for each.
    * Focus on a Trip: Use `opentrip` to select a "working" trip. Once a trip is open:
      * All activity and budget commands will apply specifically to that itinerary  
      * The command prompt will display the trip name (e.g., `[Japan Trip] >`) for clarity
@@ -203,7 +203,7 @@ Imports a trip schedule and its budget details from a provided text file into yo
 <br>
 
 #### 1.6 Deleting a Trip
-Permanently removes a trip from your travel planner. 
+Permanently removes a trip from your travel planner.
 
 * Format: `deletetrip`
   * After entering the command, the application will prompt users for inputs:
@@ -265,9 +265,14 @@ Adds a new activity to the current trip's itinerary
     Time: 09:00 to 13:00
     ===========================================================
     ```
-* Optional Field:
-    * Remark: Users may add additional notes (e.g., "Bring water", "Buy tickets early").
-    * If no remark is provided, it will be displayed as '-' in the activity list.
+#### 2.6 Add Remark to Activity
+Adds a custom remark or note to an existing activity.
+
+* Format: `addremark`
+  * After entering the command, the application will prompt the user for inputs:
+    * `Enter the index of the activity to add a remark to:`
+    * `Enter remark:`
+
 * Example usage:
 
   ```text
@@ -275,7 +280,7 @@ Adds a new activity to the current trip's itinerary
   
   Itinerary for Japan Winter Trip:
   No  | Activity                  | Location        | Date         | Time               | Remark
-  --------------------------------------------------------------------------------------------------------------
+  -------------------------------------------------------------------------------------------------
   1   | Hiking                    | Mount Fuji      | 2026-12-10   | 09:00 to 13:00    | -
   2   | Night Swim                | Hotel           | 2026-12-11   | 16:00 to 17:00    | -
 
@@ -302,7 +307,7 @@ Displays all activities in the itinerary of the opened trip
     ```text
      
   No  | Activity                  | Location        | Date         | Time               | Remark
- --------------------------------------------------------------------------------------------------------
+  -------------------------------------------------------------------------------------------------
   1   | Hiking                    | Mount Fuji      | 2026-12-10   | 09:00 to 13:00    | Bring water
   2   | Swimming                  | Hotel           | 2026-12-10   | 19:00 to 20:00    | -
     ```
@@ -357,11 +362,11 @@ Removes an activity from the itinerary.
     > deleteactivity
   
     Itinerary for Japan Winter Trip:
-    No  | Activity                  | Location        | Date         | Time              | Remark
-    ------------------------------------------------------------------------------------------------
-    1   | Hiking                    | Mount Fuji      | 2026-12-10   | 09:00 to 13:00    |Bring water
-    2   | Night Swim                | Hotel           | 2026-12-11   | 16:00 to 17:00    |-
-    3   | Firework display          | Hokkaido        | 2026-12-13   | 19:00 to 20:00    |-
+    No  | Activity                  | Location        | Date         | Time               | Remark
+    -------------------------------------------------------------------------------------------------
+    1   | Hiking                    | Mount Fuji      | 2026-12-10   | 09:00 to 13:00    | Bring water
+    2   | Night Swim                | Hotel           | 2026-12-11   | 16:00 to 17:00    | -
+    3   | Firework display          | Hokkaido        | 2026-12-13   | 19:00 to 20:00    | -
     
   Enter the index of the activity to delete:  3
     ```
@@ -374,7 +379,7 @@ Removes an activity from the itinerary.
 <br>
 
 #### 2.5 Display Next Activity
-Display the next closest activity that would happen
+Displays the next upcoming activity based on the current time.
 * Format: `nextactivity`
 * Example Usage:
     ```text
@@ -411,10 +416,10 @@ Records the expected or planned cost of an activity. You can enter the amount in
     > setbudget
   
     Itinerary for Japan Winter Trip:
-    No  | Activity                  | Location        | Date         | Time           | Remarks
-    -------------------------------------------------------------------------------------
-    1   | Hiking                    | Mount Fuji      | 2026-12-10   | 09:00 to 13:00 | -
-    2   | Night Swim                | Hotel           | 2026-12-11   | 16:00 to 17:00 | -
+    No  | Activity                  | Location        | Date         | Time               | Remark
+    -------------------------------------------------------------------------------------------------
+    1   | Hiking                    | Mount Fuji      | 2026-12-10   | 09:00 to 13:00    | -
+    2   | Night Swim                | Hotel           | 2026-12-11   | 16:00 to 17:00    | -
   
     Enter the index of the activity to add a budget for:  1
     Is this amount in foreign currency? (y/n): n
@@ -500,13 +505,13 @@ Records the actual amount spent on an activity. This allows users to compare the
 * Example usage:
     ```text
     Itinerary for Japan Winter Trip:
-    No  | Activity                  | Location        | Date         | Time           | Remarks
-    -------------------------------------------------------------------------------------
-    1   | Hiking                    | Mount Fuji      | 2026-12-10   | 09:00 to 13:00 | -
-    2   | Night Swim                | Hotel           | 2026-12-11   | 16:00 to 17:00 | -  
+    No  | Activity                  | Location        | Date         | Time               | Remark
+    -------------------------------------------------------------------------------------------------
+    1   | Hiking                    | Mount Fuji      | 2026-12-10   | 09:00 to 13:00    | -
+    2   | Night Swim                | Hotel           | 2026-12-11   | 16:00 to 17:00    | -  
     
     Enter the activity index to set actual spending (or type 'exit' to cancel):  1
-    Is the amount in foreign currency? (1 for Yes, 0 for No):  0
+    Is this amount in foreign currency? (y/n): n
     Enter amount spent ($):  50
     ```
 * Expected result:
@@ -541,9 +546,9 @@ Lists the actual expenses recorded for all activities in the currently opened tr
 
 #### 4.4 Set a Daily Expense Limit for a Trip
 Sets a daily spending limit for the currently opened trip. This allows users to manage their daily expenses more effectively and compare their total daily spending against the limit. To remove the limit, simply set it to 0.
-*Note: If the daily expense limit was set after some expenses have already been input, in the event of the daily limit being exceeded, a warning of the dates it has exceeded will be displayed*
+*Note: If the daily expense limit is set after some expenses have already been recorded, warnings will be displayed for any dates where the existing expenses exceed the new limit.*
 
-* Format: setdailylimit
+* Format: `setdailylimit`
   * After entering the command, the application will prompt the user for inputs:
     * `Enter daily spending limit to set ($):`
 
@@ -616,7 +621,7 @@ Checks off item as packed
 
 * Expected Result:
     ```text
-    Marked as packed: passport
+    Marked as packed: Passport
     ```
 <br>
 
@@ -633,7 +638,7 @@ Removes Item from the packing list
 
 * Expected Result:
     ```text
-    Removed item: passport
+    Removed item: Passport
     ```
 
 <br>
@@ -725,7 +730,7 @@ Alternatively, to transfer all your trips at once, simply copy the `traveltrio.t
 
 **Q:** Can I edit the `traveltrio.txt` file manually? 
 
-**A:** Yes, but be careful! The file must be formatted in a certain way so that the data is able to load the next session. 
+**A:** Yes, but be careful! The file must be formatted correctly for the data to load in the next session.
 You must keep the exact prefixes (like `Trip:` or `Title:`) and avoid adding empty lines.
 
 ## Command Summary
@@ -742,7 +747,7 @@ You must keep the exact prefixes (like `Trip:` or `Title:`) and avoid adding emp
 |                 | `listactivity`   | View the itinerary for the open trip.                                             |
 |                 | `editactivity`   | Modify details of an existing activity.                                           |
 |                 | `deleteactivity` | Remove an activity from the itinerary.                                            |
-|                 | `nextactivity`   | Display the next closet activity that would happen.                               |
+|                 | `nextactivity`   | Display the next closest activity that will happen.                               |
 |                 | `addremark`      | Users may add additional notes to an activity.                                    |
 | **Budget**      | `setbudget`      | Allocate funds for an activity.                                                   |
 |                 | `setexpense`     | Log actual spending for an activity.                                              |
